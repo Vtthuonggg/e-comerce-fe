@@ -7,6 +7,8 @@ class User extends Model {
   String? phone;
   String? storeName;
   String? avatar;
+  int? type;
+  String? accessToken;
 
   User();
 
@@ -17,6 +19,8 @@ class User extends Model {
     storeName = data['store_name'];
     note = data['notes'];
     avatar = data['avatar'];
+    type = data['user_type'];
+    accessToken = data['access_token'];
   }
 
   @override
@@ -26,5 +30,7 @@ class User extends Model {
         "store_name": storeName,
         "notes": note,
         "avatar": avatar,
+        "user_type": type,
+        "access_token": accessToken,
       };
 }

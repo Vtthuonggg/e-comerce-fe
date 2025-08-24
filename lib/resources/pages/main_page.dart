@@ -25,14 +25,14 @@ extension ScreenTabExt on ScreenTab {
   }
 }
 
-class MainScreen extends StatefulWidget {
-  static const path = '/main_screen';
+class MainPage extends StatefulWidget {
+  static const path = '/main_page';
 
   @override
-  _MainScreenState createState() => _MainScreenState();
+  _MainPageState createState() => _MainPageState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainPageState extends State<MainPage> {
   final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
   final PersistentTabController _tabController =
       PersistentTabController(initialIndex: 0);
@@ -79,12 +79,9 @@ class _MainScreenState extends State<MainScreen> {
             confineInSafeArea: true,
             backgroundColor: Colors.white,
             handleAndroidBackButtonPress: true,
-            // Default is true.
             resizeToAvoidBottomInset: true,
-            // This needs to be true if you want to move up the screen when keyboard appears. Default is true.
             stateManagement: true,
             selectedTabScreenContext: (context) {},
-            // Default is true.
             hideNavigationBarWhenKeyboardShows: true,
             decoration: NavBarDecoration(
                 borderRadius: BorderRadius.zero,

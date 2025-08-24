@@ -14,7 +14,7 @@ class GradientAppBar extends AppBar {
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xfff4a261), Color(0xffffc52d)],
+                colors: [Color(0xff179A6E), Color(0xff34B362)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

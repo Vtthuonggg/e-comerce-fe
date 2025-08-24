@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/app/events/login_event.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/dio/base_api_service.dart';
 import 'package:flutter_app/app/networking/logging_interceptor.dart';
@@ -21,7 +22,6 @@ class AccountApi extends BaseApiService {
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           User user = User.fromJson(response.data["data"]["user"]);
-
           await NyStorage.store(
               StorageKey.userToken, response.data["data"]["access_token"],
               inBackpack: true);
@@ -91,6 +91,7 @@ class AccountApi extends BaseApiService {
   Future<String> uploadImage(
     File image,
   ) async {
+    log(image.path);
     String? userToken = await NyStorage.read(StorageKey.userToken);
     if (userToken == null) {
       throw Exception("User token not found");

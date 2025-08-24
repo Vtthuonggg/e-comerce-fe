@@ -1,3 +1,4 @@
+import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 class LoginEvent implements NyEvent {
@@ -10,6 +11,7 @@ class LoginEvent implements NyEvent {
 class DefaultListener extends NyListener {
   @override
   handle(dynamic event) async {
-    // handle the payload from event
+    await Auth.set(event['user']);
+    routeTo(MainPage.path, navigationType: NavigationType.pushReplace);
   }
 }

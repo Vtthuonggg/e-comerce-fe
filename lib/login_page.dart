@@ -1,20 +1,18 @@
 import 'dart:developer';
+import 'package:nylo_framework/nylo_framework.dart' hide event;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/controllers/controller.dart';
+import 'package:flutter_app/app/events/login_event.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/bootstrap/extensions.dart';
 import 'package:flutter_app/register_page.dart';
 import 'package:flutter_app/resources/custom_toast.dart';
-import 'package:flutter_app/resources/pages/main_screen.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:flutter_app/bootstrap/helpers.dart';
-import 'package:nylo_framework/nylo_framework.dart';
+import '../../../bootstrap/helpers.dart';
 
 class LoginPage extends NyStatefulWidget {
   final Controller controller = Controller();
@@ -33,6 +31,7 @@ class _LoginPageState extends NyState<LoginPage> {
   String _errorMessage = '';
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  int userType = 2;
   _login() async {
     if (_emailController.text == '' || _passwordController.text == '') {
       setState(() {
@@ -47,13 +46,16 @@ class _LoginPageState extends NyState<LoginPage> {
     final payload = {
       'email': _emailController.text,
       'password': _passwordController.text,
+      'user_type': userType
     };
 
     try {
       User user = await myApi<AccountApi>((request) => request.login(payload));
+      event<LoginEvent>(data: {
+        'user': user,
+      });
       CustomToast.showToastSuccess(context,
           description: "Đăng nhập thành công");
-      routeTo(MainScreen.path, navigationType: NavigationType.pushReplace);
     } catch (e) {
       setState(() {
         _errorMessage = 'Tài khoản hoặc mật khẩu không đúng';
@@ -156,20 +158,36 @@ class _LoginPageState extends NyState<LoginPage> {
                   ),
                 ),
               ),
+              if (_errorMessage.isNotEmpty) ...[
+                SizedBox(height: 20),
+                Text(
+                  _errorMessage,
+                  style: TextStyle(color: Colors.red),
+                ),
+              ],
               SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    _errorMessage,
-                    style: TextStyle(color: Colors.red),
-                  ),
                   InkWell(
                     child: Text(
                       'Quên mật khẩu',
                       style: TextStyle(color: Colors.blue),
                     ),
                   ),
+                  Row(
+                    children: [
+                      Text('Bạn là nhân viên'),
+                      Checkbox(
+                          activeColor: ThemeColor.get(context).primaryAccent,
+                          value: userType == 1,
+                          onChanged: (value) {
+                            setState(() {
+                              userType = value! ? 1 : 2;
+                            });
+                          })
+                    ],
+                  )
                 ],
               ),
               20.verticalSpace,

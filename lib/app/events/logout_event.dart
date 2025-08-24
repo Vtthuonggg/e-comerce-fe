@@ -1,3 +1,6 @@
+import 'package:flutter_app/config/common_define.dart';
+import 'package:flutter_app/config/storage_keys.dart';
+import 'package:flutter_app/login_page.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 class LogoutEvent implements NyEvent {
@@ -10,6 +13,9 @@ class LogoutEvent implements NyEvent {
 class DefaultListener extends NyListener {
   @override
   handle(dynamic event) async {
-    // handle the payload from event
+    await Auth.remove();
+    NyStorage.delete(StorageKey.userToken, andFromBackpack: true);
+    mainScaffoldKey = null;
+    routeTo(LoginPage.path, navigationType: NavigationType.pushReplace);
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter_app/login_page.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/register_page.dart';
-import 'package:flutter_app/resources/pages/main_screen.dart';
+import 'package:flutter_app/resources/pages/dash_board_page.dart';
+import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
 import 'package:flutter_app/resources/pages/setting_page.dart';
 
@@ -17,8 +18,14 @@ import 'package:nylo_framework/nylo_framework.dart';
 
 appRouter() => nyRoutes((router) {
       router.route(
-        MainScreen.path,
-        (context) => MainScreen(),
+        MainPage.path,
+        (context) => MainPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        DashboardPage.path,
+        (context) => DashboardPage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

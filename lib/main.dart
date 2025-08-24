@@ -6,7 +6,7 @@ import 'package:flutter_app/bootstrap/app.dart';
 import 'package:flutter_app/bootstrap/boot.dart';
 import 'package:flutter_app/config/storage_keys.dart';
 import 'package:flutter_app/login_page.dart';
-import 'package:flutter_app/resources/pages/main_screen.dart';
+import 'package:flutter_app/resources/pages/main_page.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:nylo_framework/nylo_framework.dart';

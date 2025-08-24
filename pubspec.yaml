@@ -34,8 +34,11 @@ dependencies:
   form_builder_validators: ^9.0.0
   dropdown_search: ^5.0.6
   flutter_screenutil: ^5.5.4
+  flutter_speed_dial: ^7.0.0
+  draggable_fab: ^0.1.4
+
   udp: ^5.0.3
-  flutter_ffmpeg: ^0.4.0
+  # flutter_ffmpeg: ^0.4.0
   video_player: ^2.5.1
   flutter:
     sdk: flutter
