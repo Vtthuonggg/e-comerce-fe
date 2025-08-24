@@ -46,6 +46,13 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
     setState(() {
       _loading = true;
     });
+    Map<String, dynamic> data = {
+      'store_name':
+          _formKey.currentState?.fields['store_name']?.value.toString(),
+      'name': _formKey.currentState?.fields['name']?.value.toString(),
+      'phone_number': _formKey.currentState?.fields['phone']?.value.toString(),
+      'notes': _formKey.currentState?.fields['notes']?.value.toString(),
+    };
     String? avatarUrl;
     if (_imageFile != null) {
       try {
@@ -61,14 +68,11 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
         return;
       }
     }
-    Map<String, dynamic> data = {
-      'store_name':
-          _formKey.currentState?.fields['store_name']?.value.toString(),
-      'name': _formKey.currentState?.fields['name']?.value.toString(),
-      'phone_number': _formKey.currentState?.fields['phone']?.value.toString(),
-      'notes': _formKey.currentState?.fields['notes']?.value.toString(),
-      'avatar': avatarUrl,
-    };
+    if (avatarUrl != null) {
+      data['avatar'] = avatarUrl;
+    } else {
+      data['avatar'] = account.avatar;
+    }
     try {
       await myApi<AccountApi>((request) => request.updateInfoAccount(data));
       CustomToast.showToastSuccess(context, description: "Cập nhật thành công");
@@ -135,11 +139,26 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
                   decoration: InputDecoration(labelText: 'Ghi chú'),
                 ),
                 15.verticalSpace,
-                ElevatedButton(
-                  onPressed: () {
-                    _saveData();
-                  },
-                  child: Text('Lưu'),
+                SizedBox(
+                  width: 0.5.sw,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      backgroundColor: ThemeColor.get(context).primaryAccent,
+                      foregroundColor: Colors.white,
+                    ),
+                    onPressed: () {
+                      _saveData();
+                    },
+                    child: _loading
+                        ? CircularProgressIndicator(
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
+                          )
+                        : Text('Lưu'),
+                  ),
                 ),
               ],
             ),

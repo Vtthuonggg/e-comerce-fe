@@ -22,8 +22,7 @@ class AccountApi extends BaseApiService {
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           User user = User.fromJson(response.data["data"]["user"]);
-          await NyStorage.store(
-              StorageKey.userToken, response.data["data"]["access_token"],
+          await NyStorage.store(StorageKey.userToken, user.accessToken,
               inBackpack: true);
           return user;
         });
@@ -61,7 +60,7 @@ class AccountApi extends BaseApiService {
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           log(response.data.toString());
-          User user = User.fromJson(response.data);
+          User user = User.fromJson(response.data['data']['user']);
           return user;
         });
   }
