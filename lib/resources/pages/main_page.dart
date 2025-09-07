@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/common_define.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
+import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/setting_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
@@ -111,6 +112,7 @@ class _MainPageState extends State<MainPage> {
   List<Widget> _buildScreens() {
     return [
       DashboardPage(key: _homeNavKey),
+      ListProductPage(key: _productNavKey),
       SettingPage(
         key: _accountNavKey,
       ),
@@ -136,9 +138,25 @@ class _MainPageState extends State<MainPage> {
           textStyle: TextStyle(
               color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
+          title: 'Sản phẩm',
+          icon: Icon(
+            FontAwesomeIcons.store,
+            color: activeColor,
+            size: 25,
+          ),
+          inactiveIcon: Icon(
+            FontAwesomeIcons.store,
+            color: inactiveColor,
+            size: 22,
+          ),
+          activeColorPrimary: activeColor,
+          inactiveColorPrimary: inactiveColor,
+          textStyle: TextStyle(
+              color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+      PersistentBottomNavBarItem(
           title: 'Cài đặt',
           icon: Icon(
-            FontAwesomeIcons.cog,
+            FontAwesomeIcons.store,
             color: activeColor,
             size: 25,
           ),

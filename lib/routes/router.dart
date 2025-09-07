@@ -3,6 +3,8 @@ import 'package:flutter_app/main.dart';
 import 'package:flutter_app/register_page.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
+import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
+import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
 import 'package:flutter_app/resources/pages/setting_page.dart';
 
@@ -56,6 +58,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         InfoSettingPage.path,
         (context) => InfoSettingPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ListProductPage.path,
+        (context) => ListProductPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditProductPage.path,
+        (context) => EditProductPage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

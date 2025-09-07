@@ -21,7 +21,7 @@ enum DashboardItem {
 }
 
 extension DashboardItemExtension on DashboardItem {
-  String getTitle() {
+  String get name {
     switch (this) {
       case DashboardItem.Table:
         return 'Bàn';
@@ -118,7 +118,6 @@ extension DashboardItemExtension on DashboardItem {
 
 List<DashboardItem> getDashboardItems() {
   int? userType = Auth.user<User>()?.type;
-  log(userType.toString());
   switch (userType) {
     case 2:
       return [
