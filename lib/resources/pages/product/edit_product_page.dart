@@ -44,7 +44,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
       };
 
       try {
-        await myApi<ProductApiService>(
+        await api<ProductApiService>(
             (request) => request.createProduct(payload));
 
         showToastSuccess(description: "Tạo sản phẩm thành công!");

@@ -17,7 +17,7 @@ class ThemeColor {
   static Color fromHex(String hexColor) => nyHexColor(hexColor);
 }
 
-myApi<T>(dynamic Function(T request) request,
+api<T>(dynamic Function(T request) request,
         {BuildContext? context,
         Map<String, dynamic> headers = const {},
         String? bearerToken,

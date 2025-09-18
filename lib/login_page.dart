@@ -50,7 +50,7 @@ class _LoginPageState extends NyState<LoginPage> {
     };
 
     try {
-      User user = await myApi<AccountApi>((request) => request.login(payload));
+      User user = await api<AccountApi>((request) => request.login(payload));
       event<LoginEvent>(data: {
         'user': user,
       });

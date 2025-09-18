@@ -28,8 +28,7 @@ class _SettingPageState extends NyState<SettingPage> {
 
   Future fetchAccountInfo() async {
     try {
-      User account =
-          await myApi<AccountApi>((request) => request.infoAccount());
+      User account = await api<AccountApi>((request) => request.infoAccount());
       _account = account;
     } catch (e) {
       log(e.toString());

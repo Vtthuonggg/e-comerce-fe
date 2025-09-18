@@ -58,7 +58,7 @@ class _RegisterPageState extends NyState<RegisterPage> {
     };
 
     try {
-      await myApi<AccountApi>((request) => request.register(payload));
+      await api<AccountApi>((request) => request.register(payload));
       CustomToast.showToastSuccess(context, description: "Đăng ký thành công");
       Navigator.of(context).pop();
     } catch (e) {

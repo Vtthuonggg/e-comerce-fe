@@ -56,7 +56,7 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
     String? avatarUrl;
     if (_imageFile != null) {
       try {
-        avatarUrl = await myApi<AccountApi>(
+        avatarUrl = await api<AccountApi>(
             (request) => request.uploadImage(_imageFile!));
       } catch (e) {
         log(e.toString());
@@ -74,7 +74,7 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
       data['avatar'] = account.avatar;
     }
     try {
-      await myApi<AccountApi>((request) => request.updateInfoAccount(data));
+      await api<AccountApi>((request) => request.updateInfoAccount(data));
       CustomToast.showToastSuccess(context, description: "Cập nhật thành công");
 
       Navigator.pop(context);

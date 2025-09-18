@@ -70,3 +70,6 @@ flutter {
 dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
 }
+configurations.all {
+    exclude group: 'com.google.errorprone', module: 'error_prone_annotations'
+}

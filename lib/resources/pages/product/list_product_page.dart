@@ -39,7 +39,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
   _fetchProducts(int pageKey) async {
     try {
       Map<String, dynamic> newItems =
-          await myApi<ProductApiService>((request) => request.listProduct(
+          await api<ProductApiService>((request) => request.listProduct(
                 searchQuery,
                 pageKey,
                 _pageSize,
