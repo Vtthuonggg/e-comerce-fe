@@ -156,7 +156,7 @@ class _MainPageState extends State<MainPage> {
       PersistentBottomNavBarItem(
           title: 'Cài đặt',
           icon: Icon(
-            FontAwesomeIcons.store,
+            FontAwesomeIcons.cog,
             color: activeColor,
             size: 25,
           ),

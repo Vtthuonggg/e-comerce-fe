@@ -11,6 +11,7 @@ class GradientAppBar extends AppBar {
           title: title,
           leading: leading,
           actions: actions,
+          foregroundColor: Colors.white,
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(

@@ -68,7 +68,8 @@ class _ListProductPageState extends NyState<ListProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        title: Text('Danh sách sản phẩm'),
+        title: Text('Danh sách sản phẩm',
+            style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: SafeArea(
         child: RefreshIndicator(

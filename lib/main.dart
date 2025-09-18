@@ -242,6 +242,10 @@ void main() async {
               },
             ),
           ),
+          appBarTheme: AppBarTheme(
+            backgroundColor: createColor(LightThemeColors().primaryAccent),
+            foregroundColor: Colors.white,
+          ),
         ),
       )));
 }
