@@ -6,7 +6,7 @@ import 'package:flutter_app/app/controllers/controller.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
-import 'package:flutter_app/resources/custom_toast.dart';
+import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,7 +16,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 class InfoSettingPage extends NyStatefulWidget {
   final Controller controller = Controller();
   static const path = '/info_setting_page';
-  InfoSettingPage({Key? key}) : super(path, key: key);
+  InfoSettingPage({Key? key}) : super(key: key);
 
   @override
   State<InfoSettingPage> createState() => _InfoSettingPageState();

@@ -1,29 +1,25 @@
-import '/config/decoders.dart';
-import '/config/design.dart';
-import '/config/theme.dart';
-import '/config/validation_rules.dart';
+import 'package:flutter_app/config/decoders.dart';
+import 'package:flutter_app/config/design.dart';
+import 'package:flutter_app/config/theme.dart';
+import 'package:flutter_app/config/validation_rules.dart';
 import 'package:nylo_framework/nylo_framework.dart';
-import '/config/localization.dart';
+import '../../config/localization.dart';
 
 class AppProvider implements NyProvider {
   @override
   boot(Nylo nylo) async {
     await NyLocalization.instance.init(
-      localeType: localeType,
-      languageCode: languageCode,
-      assetsDirectory: assetsDirectory,
-    );
+        localeType: localeType,
+        languageCode: languageCode,
+        languagesList: languagesList,
+        assetsDirectory: assetsDirectory,
+        valuesAsMap: valuesAsMap);
 
-    nylo.addLoader(loader);
-    nylo.addLogo(logo);
-    nylo.addThemes(appThemes);
-    nylo.addToastNotification(getToastNotificationWidget);
+    nylo.appLoader = loader;
+    nylo.appLogo = logo;
+    nylo.appThemes = appThemes;
     nylo.addValidationRules(validationRules);
     nylo.addModelDecoders(modelDecoders);
-
-    // Optional
-    // nylo.showDateTimeInLogs(); // Show date time in logs
-    // nylo.monitorAppUsage(); // Monitor the app usage
 
     return nylo;
   }

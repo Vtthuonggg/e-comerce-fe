@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '/config/design.dart';
+import 'package:flutter_app/config/theme.dart';
+import '/config/font.dart';
 import '/resources/themes/styles/color_styles.dart';
 import '/resources/themes/text_theme/default_text_theme.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-/* Light Theme
+/*
 |--------------------------------------------------------------------------
+| Light Theme
+|
 | Theme Config - config/theme.dart
-|-------------------------------------------------------------------------- */
+|--------------------------------------------------------------------------
+*/
 
 ThemeData lightTheme(ColorStyles color) {
   TextTheme lightTheme =
@@ -23,7 +27,6 @@ ThemeData lightTheme(ColorStyles color) {
     hintColor: color.primaryAccent,
     dividerTheme: DividerThemeData(color: Colors.grey[100]),
     appBarTheme: AppBarTheme(
-      surfaceTintColor: Colors.transparent,
       backgroundColor: color.appBarBackground,
       titleTextStyle:
           lightTheme.titleLarge!.copyWith(color: color.appBarPrimaryContent),
@@ -54,7 +57,7 @@ ThemeData lightTheme(ColorStyles color) {
     ),
     textTheme: lightTheme,
     colorScheme: ColorScheme.light(
-        background: color.background, primary: color.primaryAccent),
+        background: color.background, primary: lightColors.primaryAccent),
   );
 }
 
@@ -66,7 +69,7 @@ ThemeData lightTheme(ColorStyles color) {
 
 TextTheme _textTheme(ColorStyles colors) {
   Color primaryContent = colors.primaryContent;
-  TextTheme textTheme = const TextTheme().apply(displayColor: primaryContent);
+  TextTheme textTheme = TextTheme().apply(displayColor: primaryContent);
   return textTheme.copyWith(
       labelLarge: TextStyle(color: primaryContent.withOpacity(0.8)));
 }

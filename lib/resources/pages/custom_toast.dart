@@ -89,32 +89,127 @@ class CustomToast {
     });
   }
 
+  static void _showToast(
+      BuildContext context, String message, Color color, IconData icon) {
+    if (!context.mounted) return; // Context safety check
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: color,
+        duration: Duration(seconds: 3),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   static void showToastSuccess(BuildContext context,
       {required String description}) {
     showToast(
       context,
       description,
-      textColor: Colors.green[900]!,
+      textColor: Colors.white,
       icon: Icons.check_circle_outline_rounded,
-      iconColor: Colors.green,
+      iconColor: Colors.white,
+      backgroundColor: Color(0xFF4CAF50), // Material Green
+    );
+  }
+
+  static void showToastInfo(BuildContext context,
+      {required String description}) {
+    showToast(
+      context,
+      description,
+      textColor: Colors.white,
+      icon: Icons.info_outline_rounded,
+      iconColor: Colors.white,
+      backgroundColor: Color(0xFF2196F3), // Material Blue
+    );
+  }
+
+  static void showToastError(BuildContext context,
+      {required String description}) {
+    showToast(
+      context,
+      description,
+      textColor: Colors.white,
+      icon: Icons.error_outline_rounded,
+      iconColor: Colors.white,
+      backgroundColor: Color(0xFFEB5757), // Red
     );
   }
 
   static void showToastWarning(BuildContext context,
       {required String description}) {
-    showToast(context, description,
-        icon: Icons.warning,
-        textColor: Colors.white,
-        iconColor: Colors.white,
-        backgroundColor: Color(0xffEB5757));
+    showToast(
+      context,
+      description,
+      textColor: Colors.white,
+      icon: Icons.warning_amber_rounded,
+      iconColor: Colors.white,
+      backgroundColor: Color(0xFFFF9800), // Material Orange
+    );
   }
+}
 
-  // static void showToastFail(BuildContext context,
-  //     {required String description}) {
-  //   showToast(context, description,
-  //       icon: Icons.info_outline,
-  //       textColor: Colors.white,
-  //       iconColor: Colors.white,
-  //       backgroundColor: Color(0xffF2C94C));
-  // }
+/// A customizable UnderlineRow widget with adjustable border width.
+///
+/// [borderWidth] mặc định là 2.0 nhưng có thể được điều chỉnh khi khởi tạo.
+/// Bạn cũng có thể tùy chỉnh màu sắc của đường viền nếu muốn.
+class UnderlineRow extends StatelessWidget {
+  final double borderWidth; // Mặc định là 2.0
+  final Color firstBorderColor;
+  final Color secondBorderColor;
+
+  const UnderlineRow({
+    Key? key,
+    this.borderWidth = 2.0, // Giá trị mặc định
+    this.firstBorderColor = Colors.black,
+    this.secondBorderColor = Colors.grey,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 3.0),
+      child: Row(
+        children: [
+          Container(
+            width: 100,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border(
+                bottom: BorderSide(
+                  color: firstBorderColor.withOpacity(0.8),
+                  width: borderWidth,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(
+                  topRight: Radius.circular(5),
+                  bottomRight: Radius.circular(5),
+                ),
+                border: Border(
+                  bottom: BorderSide(
+                    color: secondBorderColor.withOpacity(0.2),
+                    width: borderWidth,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

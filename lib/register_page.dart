@@ -3,7 +3,7 @@ import 'package:flutter_app/app/controllers/controller.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/bootstrap/extensions.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
-import 'package:flutter_app/resources/custom_toast.dart';
+import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -13,7 +13,7 @@ class RegisterPage extends NyStatefulWidget {
   final Controller controller = Controller();
 
   static const path = '/register_page';
-  RegisterPage({Key? key}) : super(path, key: key);
+  RegisterPage({Key? key}) : super(key: key);
 
   @override
   State<RegisterPage> createState() => _RegisterPageState();
@@ -54,6 +54,7 @@ class _RegisterPageState extends NyState<RegisterPage> {
       'name': _nameController.text,
       'email': _emailController.text,
       'password': _passwordController.text,
+      'user_type': 2,
     };
 
     try {

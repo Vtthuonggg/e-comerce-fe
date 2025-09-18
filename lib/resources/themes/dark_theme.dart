@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '/config/design.dart';
+import '../../config/theme.dart';
+import '/config/font.dart';
 import '/resources/themes/styles/color_styles.dart';
 import '/resources/themes/text_theme/default_text_theme.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-/* Dark Theme
+import 'light_theme.dart';
+
+/*
 |--------------------------------------------------------------------------
+| Dark Theme
+|
 | Theme Config - config/theme.dart
-|-------------------------------------------------------------------------- */
+|--------------------------------------------------------------------------
+*/
 
 ThemeData darkTheme(ColorStyles color) {
   TextTheme darkTheme =
@@ -16,19 +22,21 @@ ThemeData darkTheme(ColorStyles color) {
   return ThemeData(
     useMaterial3: true,
     primaryColor: color.primaryContent,
-    primaryColorDark: color.primaryContent,
+    primaryColorLight: color.primaryAccent,
     focusColor: color.primaryContent,
     scaffoldBackgroundColor: color.background,
+    hintColor: color.primaryAccent,
+    dividerTheme: DividerThemeData(color: Colors.grey[100]),
     appBarTheme: AppBarTheme(
-        surfaceTintColor: Colors.transparent,
-        backgroundColor: color.appBarBackground,
-        titleTextStyle:
-            darkTheme.titleLarge!.copyWith(color: color.appBarPrimaryContent),
-        iconTheme: IconThemeData(color: color.appBarPrimaryContent),
-        elevation: 1.0,
-        systemOverlayStyle: SystemUiOverlayStyle.light),
+      backgroundColor: color.appBarBackground,
+      titleTextStyle:
+          darkTheme.titleLarge!.copyWith(color: color.appBarPrimaryContent),
+      iconTheme: IconThemeData(color: color.appBarPrimaryContent),
+      elevation: 1.0,
+      systemOverlayStyle: SystemUiOverlayStyle.dark,
+    ),
     buttonTheme: ButtonThemeData(
-      buttonColor: color.primaryAccent,
+      buttonColor: color.buttonPrimaryContent,
       colorScheme: ColorScheme.light(primary: color.buttonBackground),
     ),
     textButtonTheme: TextButtonThemeData(
@@ -49,7 +57,8 @@ ThemeData darkTheme(ColorStyles color) {
       selectedItemColor: color.bottomTabBarLabelSelected,
     ),
     textTheme: darkTheme,
-    colorScheme: ColorScheme.dark(background: color.background),
+    colorScheme: ColorScheme.light(
+        background: color.background, primary: lightColors.primaryAccent),
   );
 }
 
@@ -61,10 +70,7 @@ ThemeData darkTheme(ColorStyles color) {
 
 TextTheme _textTheme(ColorStyles colors) {
   Color primaryContent = colors.primaryContent;
-  TextTheme textTheme = const TextTheme().apply(displayColor: primaryContent);
+  TextTheme textTheme = TextTheme().apply(displayColor: primaryContent);
   return textTheme.copyWith(
-      titleLarge: TextStyle(color: primaryContent.withOpacity(0.8)),
-      labelLarge: TextStyle(color: primaryContent.withOpacity(0.8)),
-      bodySmall: TextStyle(color: primaryContent.withOpacity(0.8)),
-      bodyMedium: TextStyle(color: primaryContent.withOpacity(0.8)));
+      labelLarge: TextStyle(color: primaryContent.withOpacity(0.8)));
 }

@@ -1,5 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+
+StreamController<ThemeData> resetTheme = StreamController();
 
 // ignore: must_be_immutable
 class AppBuild extends StatelessWidget {
@@ -29,7 +35,7 @@ class AppBuild extends StatelessWidget {
   Route<dynamic>? Function(RouteSettings settings) onGenerateRoute;
 
   AppBuild({
-    super.key,
+    Key? key,
     this.initialRoute,
     this.title,
     this.locale,
@@ -44,7 +50,7 @@ class AppBuild extends StatelessWidget {
     this.color,
     this.lightTheme,
     this.darkTheme,
-    this.themeMode = ThemeMode.light,
+    this.themeMode = ThemeMode.system,
     this.supportedLocales,
     this.debugShowMaterialGrid = false,
     this.showPerformanceOverlay = false,
@@ -54,56 +60,70 @@ class AppBuild extends StatelessWidget {
     this.debugShowCheckedModeBanner = true,
     this.shortcuts,
     this.actions,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<AppTheme> appThemes = Nylo.getAppThemes();
-    return LocalizedApp(
-      child: ThemeProvider(
-        themes: appThemes,
-        child: ThemeConsumer(
-          child: ValueListenableBuilder(
-            valueListenable:
-                ValueNotifier(locale ?? NyLocalization.instance.locale),
-            builder: (context, Locale locale, _) => MaterialApp(
-              navigatorKey: navigatorKey,
-              themeMode: themeMode,
-              onGenerateTitle: onGenerateTitle,
-              onGenerateInitialRoutes: onGenerateInitialRoutes,
-              onUnknownRoute: onUnknownRoute,
-              builder: builder,
-              navigatorObservers: navigatorObservers,
-              color: color,
-              debugShowMaterialGrid: debugShowMaterialGrid,
-              showPerformanceOverlay: showPerformanceOverlay,
-              checkerboardRasterCacheImages: checkerboardRasterCacheImages,
-              checkerboardOffscreenLayers: checkerboardOffscreenLayers,
-              showSemanticsDebugger: showSemanticsDebugger,
-              debugShowCheckedModeBanner: debugShowCheckedModeBanner,
-              shortcuts: shortcuts,
-              actions: actions,
-              title: title ?? "",
-              darkTheme: darkTheme ??
-                  appThemes
-                      .firstWhere(
-                          (theme) => theme.id == getEnv('DARK_THEME_ID'),
-                          orElse: () => appThemes.first)
-                      .data,
-              initialRoute: initialRoute,
-              onGenerateRoute: onGenerateRoute,
-              theme: themeData ?? ThemeProvider.themeOf(context).data,
-              localeResolutionCallback:
-                  (Locale? locale, Iterable<Locale> supportedLocales) {
-                return locale;
-              },
-              localizationsDelegates: NyLocalization.instance.delegates,
-              locale: locale,
-              supportedLocales: supportedLocales ?? [Locale('vi', 'VN')],
+    Nylo nylo = Backpack.instance.nylo();
+    List<AppTheme> appThemes =
+        nylo.appThemes.map((appTheme) => appTheme.toAppTheme()).toList();
+    return RefreshConfiguration(
+        headerBuilder: () => const WaterDropMaterialHeader(),
+        // Configure the default header indicator. If you have the same header indicator for each page, you need to set this
+        footerBuilder: () => const ClassicFooter(
+              loadStyle: LoadStyle.HideAlways,
+            ),
+        child: LocalizedApp(
+          child: ThemeProvider(
+            themes: appThemes,
+            child: ThemeConsumer(
+              child: ValueListenableBuilder(
+                  valueListenable:
+                      ValueNotifier(locale ?? NyLocalization.instance.locale),
+                  builder: (context, Locale locale, _) =>
+                      StreamBuilder<ThemeData>(
+                          initialData:
+                              themeData ?? ThemeProvider.themeOf(context).data,
+                          stream: resetTheme.stream,
+                          builder: (context, snapshot) {
+                            return MaterialApp(
+                              navigatorKey: navigatorKey,
+                              onGenerateTitle: onGenerateTitle,
+                              onGenerateInitialRoutes: onGenerateInitialRoutes,
+                              onUnknownRoute: onUnknownRoute,
+                              builder: builder,
+                              navigatorObservers: navigatorObservers,
+                              color: color,
+                              debugShowMaterialGrid: debugShowMaterialGrid,
+                              showPerformanceOverlay: showPerformanceOverlay,
+                              checkerboardRasterCacheImages:
+                                  checkerboardRasterCacheImages,
+                              checkerboardOffscreenLayers:
+                                  checkerboardOffscreenLayers,
+                              showSemanticsDebugger: showSemanticsDebugger,
+                              debugShowCheckedModeBanner:
+                                  debugShowCheckedModeBanner,
+                              shortcuts: shortcuts,
+                              actions: actions,
+                              title: title ?? "",
+                              initialRoute: initialRoute,
+                              onGenerateRoute: onGenerateRoute,
+                              theme: snapshot.data,
+                              localeResolutionCallback: (Locale? locale,
+                                  Iterable<Locale> supportedLocales) {
+                                return locale;
+                              },
+                              localizationsDelegates: [
+                                ...NyLocalization.instance.delegates,
+                                FormBuilderLocalizations.delegate,
+                              ],
+                              locale: locale,
+                              supportedLocales: supportedLocales ??
+                                  NyLocalization.instance.locals(),
+                            );
+                          })),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

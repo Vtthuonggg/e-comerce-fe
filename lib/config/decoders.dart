@@ -1,5 +1,6 @@
 import 'package:flutter_app/app/networking/dio/base_api_service.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
+import 'package:flutter_app/app/networking/product_api.dart';
 import '/app/models/user.dart';
 import '/app/networking/api_service.dart';
 
@@ -31,6 +32,7 @@ final Map<Type, dynamic> modelDecoders = {
 final Map<Type, BaseApiService> apiDecoders = {
   ApiService: ApiService(),
   AccountApi: AccountApi(),
+  ProductApiService: ProductApiService(),
 
   // ...
 };

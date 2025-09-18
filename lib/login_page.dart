@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:nylo_framework/nylo_framework.dart' hide event;
 
 import 'package:flutter/material.dart';
@@ -8,7 +9,6 @@ import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/bootstrap/extensions.dart';
 import 'package:flutter_app/register_page.dart';
-import 'package:flutter_app/resources/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -19,7 +19,7 @@ class LoginPage extends NyStatefulWidget {
 
   static const path = '/login_page';
 
-  LoginPage({Key? key}) : super(path, key: key);
+  LoginPage({Key? key}) : super(key: key);
 
   @override
   State<LoginPage> createState() => _LoginPageState();

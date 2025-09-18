@@ -12,14 +12,13 @@ import 'package:nylo_framework/nylo_framework.dart' hide event;
 
 class SettingPage extends NyStatefulWidget {
   static const path = '/setting_page';
-  SettingPage({Key? key}) : super(path, key: key);
+  SettingPage({Key? key}) : super(key: key);
 
   @override
   State<SettingPage> createState() => _SettingPageState();
 }
 
 class _SettingPageState extends NyState<SettingPage> {
-  bool _loading = true;
   User? _account;
   @override
   initState() {
@@ -35,9 +34,7 @@ class _SettingPageState extends NyState<SettingPage> {
     } catch (e) {
       log(e.toString());
     } finally {
-      setState(() {
-        _loading = false;
-      });
+      setState(() {});
     }
   }
 

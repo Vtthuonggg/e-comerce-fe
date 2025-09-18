@@ -1,51 +1,38 @@
+import 'package:flutter/material.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 /// Interface for your base styles.
 /// Add more styles here and then implement in
 /// light_theme_colors.dart and dark_theme_colors.dart.
-
+///
 abstract class ColorStyles extends BaseColorStyles {
   /// * Available styles *
 
   // general
-  @override
   Color get background;
-  @override
   Color get primaryContent;
-  @override
-  Color get primaryAccent => const Color(0xFF179A6E);
+  Color get primaryAccent;
 
-  @override
   Color get surfaceBackground;
-  @override
   Color get surfaceContent;
 
   // app bar
-  @override
   Color get appBarBackground;
-  @override
   Color get appBarPrimaryContent;
 
   // buttons
-  @override
   Color get buttonBackground;
-  @override
   Color get buttonPrimaryContent;
 
   // bottom tab bar
-  @override
   Color get bottomTabBarBackground;
 
   // bottom tab bar - icons
-  @override
   Color get bottomTabBarIconSelected;
-  @override
   Color get bottomTabBarIconUnselected;
 
   // bottom tab bar - label
-  @override
   Color get bottomTabBarLabelUnselected;
-  @override
   Color get bottomTabBarLabelSelected;
 
   // e.g. add a new style
@@ -55,4 +42,21 @@ abstract class ColorStyles extends BaseColorStyles {
   // Then implement in color in:
   // /resources/themes/styles/light_theme_colors
   // /resources/themes/styles/dark_theme_colors
+}
+
+extension HexColor on Color {
+  /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
+  static Color fromHex(String hexString) {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  }
+
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
 }
