@@ -37,6 +37,7 @@ class ProductApiService extends BaseApiService {
         throw error;
       },
       handleSuccess: (response) async {
+        log(response.data.toString());
         return response.data;
       },
     );

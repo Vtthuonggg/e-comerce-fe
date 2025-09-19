@@ -59,14 +59,12 @@ class AccountApi extends BaseApiService {
             ),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
-          log(response.data.toString());
           User user = User.fromJson(response.data['data']['user']);
           return user;
         });
   }
 
   Future<dynamic> updateInfoAccount(dynamic data) async {
-    log(data.toString());
     String? userToken = await NyStorage.read(StorageKey.userToken);
     if (userToken == null) {
       throw Exception("User token not found");
@@ -90,7 +88,6 @@ class AccountApi extends BaseApiService {
   Future<String> uploadImage(
     File image,
   ) async {
-    log(image.path);
     String? userToken = await NyStorage.read(StorageKey.userToken);
     if (userToken == null) {
       throw Exception("User token not found");
@@ -114,6 +111,27 @@ class AccountApi extends BaseApiService {
         handleSuccess: (response) async {
           log(response.data.toString());
           return response.data['url'];
+        });
+  }
+
+  Future currentUser() async {
+    return await network(
+        request: (request) => request.get("/user/info"),
+        handleFailure: (error) => throw error,
+        handleSuccess: (response) async {
+          return response.data["data"];
+        });
+  }
+
+  Future saveDeviceToken(String token) async {
+    return await network(
+        request: (request) => request.post("/user/device-token", data: {
+              "device_token": token,
+              "device_type": Platform.isIOS ? 1 : 2
+            }),
+        handleFailure: (error) => throw error,
+        handleSuccess: (response) async {
+          return response.data;
         });
   }
 }

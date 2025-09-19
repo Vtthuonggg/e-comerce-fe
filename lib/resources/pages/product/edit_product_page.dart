@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
+import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -47,10 +48,14 @@ class _EditProductPageState extends NyState<EditProductPage> {
         await api<ProductApiService>(
             (request) => request.createProduct(payload));
 
-        showToastSuccess(description: "Tạo sản phẩm thành công!");
+        CustomToast.showToastSuccess(context,
+            description: isEdit
+                ? "Cập nhật sản phẩm thành công"
+                : "Tạo sản phẩm thành công");
         pop();
       } catch (e) {
-        showToastDanger(description: "Có lỗi xảy ra: ${e.toString()}");
+        CustomToast.showToastError(context,
+            description: "Có lỗi xảy ra: ${e.toString()}");
       } finally {
         setState(() {
           _isLoading = false;
@@ -73,6 +78,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                SizedBox(height: 16),
                 FormBuilderTextField(
                   name: 'name',
                   keyboardType: TextInputType.streetAddress,

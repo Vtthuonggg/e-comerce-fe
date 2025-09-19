@@ -6,7 +6,7 @@ class BearerAuthInterceptor extends Interceptor {
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
     String? userToken = Backpack.instance.read(StorageKey.userToken);
     options.headers.addAll({"Authorization": "Bearer $userToken"});
-      return super.onRequest(options, handler);
+    return super.onRequest(options, handler);
   }
 
   @override

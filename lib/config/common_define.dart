@@ -7,6 +7,17 @@ GlobalKey<ScaffoldState>? mainScaffoldKey;
 PersistentTabController? tabController;
 
 final AccountApi userApiService = AccountApi();
+// Future<void> getFCMTokenAndSave() async {
+//   try {
+//     final token = await FCMService.getFCMToken();
+//     if (token != null) {
+//       await userApiService.saveDeviceToken(token);
+//       print("save fcmToken success");
+//     }
+//   } catch (e) {
+//     print('Error while getting FCM Token: $e');
+//   }
+// }
 
 MaterialColor createColor(Color color) {
   Map<int, Color> swatch = {
