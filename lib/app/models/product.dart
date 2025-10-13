@@ -7,6 +7,7 @@ class Product extends Model {
   int? baseCost;
   num? stock;
   int? categoryId;
+  String? image;
 
   Product({
     this.name,
@@ -14,6 +15,7 @@ class Product extends Model {
     this.baseCost,
     this.stock,
     required this.categoryId,
+    this.image,
   });
 
   Product.fromJson(dynamic data) {
@@ -22,14 +24,18 @@ class Product extends Model {
     baseCost = data['base_cost'];
     stock = data['stock'];
     categoryId = data['category_id'];
+    image = data['image'];
+    id = data['id'];
   }
 
   @override
   toJson() => {
+        "id": id,
         "name": name,
         "retail_cost": retailCost,
         "base_cost": baseCost,
         "stock": stock,
         "category_id": categoryId,
+        "image": image,
       };
 }

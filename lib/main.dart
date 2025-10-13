@@ -2,8 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/bootstrap/app.dart';
 import 'package:flutter_app/bootstrap/boot.dart';
+import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/common_define.dart';
 import 'package:flutter_app/config/storage_keys.dart';
 import 'package:flutter_app/login_page.dart';
@@ -267,7 +269,12 @@ class _SplashScreenState extends State<SplashScreen> {
   void _checkUserToken() async {
     String? userToken = await NyStorage.read(StorageKey.userToken);
     if (userToken != null) {
-      routeTo(MainPage.path, navigationType: NavigationType.pushReplace);
+      try {
+        await api<AccountApi>((request) => request.infoAccount());
+        routeTo(MainPage.path, navigationType: NavigationType.pushReplace);
+      } catch (e) {
+        routeTo(LoginPage.path, navigationType: NavigationType.pushReplace);
+      }
     } else {
       routeTo(LoginPage.path, navigationType: NavigationType.pushReplace);
     }

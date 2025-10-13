@@ -29,11 +29,11 @@ class _LoginPageState extends NyState<LoginPage> {
   bool _loading = false;
   bool _isPasswordVisible = false;
   String _errorMessage = '';
-  TextEditingController _emailController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   int userType = 2;
   _login() async {
-    if (_emailController.text == '' || _passwordController.text == '') {
+    if (_phoneController.text == '' || _passwordController.text == '') {
       setState(() {
         _errorMessage = 'Vui lòng nhập đầy đủ thông tin';
       });
@@ -44,9 +44,8 @@ class _LoginPageState extends NyState<LoginPage> {
       _loading = true;
     });
     final payload = {
-      'email': _emailController.text,
+      'phone': _phoneController.text,
       'password': _passwordController.text,
-      'user_type': userType
     };
 
     try {
@@ -99,7 +98,7 @@ class _LoginPageState extends NyState<LoginPage> {
               ),
               12.verticalSpace,
               TextField(
-                controller: _emailController,
+                controller: _phoneController,
                 cursorColor: context.color.primaryAccent,
                 onTapOutside: (event) {
                   FocusScope.of(context).unfocus();

@@ -8,7 +8,7 @@ class User extends Model {
   String? storeName;
   String? avatar;
   int? type;
-  String? accessToken;
+  String? apiKey;
 
   User();
 
@@ -20,7 +20,7 @@ class User extends Model {
     note = data['notes'];
     avatar = data['avatar'];
     type = data['user_type'];
-    accessToken = data['access_token'];
+    apiKey = data['api_key'];
   }
 
   @override
@@ -31,6 +31,6 @@ class User extends Model {
         "notes": note,
         "avatar": avatar,
         "user_type": type,
-        "access_token": accessToken,
+        "api_key": apiKey,
       };
 }

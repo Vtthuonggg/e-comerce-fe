@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/app/events/login_event.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/dio/base_api_service.dart';
+import 'package:flutter_app/app/networking/dio/interceptors/bearer_auth_interceptor.dart';
 import 'package:flutter_app/app/networking/logging_interceptor.dart';
 import 'package:flutter_app/config/storage_keys.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -12,7 +13,11 @@ import 'package:nylo_framework/nylo_framework.dart';
 class AccountApi extends BaseApiService {
   AccountApi({BuildContext? buildContext}) : super(buildContext);
   @override
-  final interceptors = {LoggingInterceptor: LoggingInterceptor()};
+  final interceptors = {
+    LoggingInterceptor: LoggingInterceptor(),
+    BearerAuthInterceptor: BearerAuthInterceptor(),
+  };
+
   @override
   String get baseUrl => getEnv('API_BASE_URL');
 
@@ -22,7 +27,8 @@ class AccountApi extends BaseApiService {
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           User user = User.fromJson(response.data["data"]["user"]);
-          await NyStorage.store(StorageKey.userToken, user.accessToken,
+          await NyStorage.store(
+              StorageKey.userToken, response.data["data"]["access_token"],
               inBackpack: true);
           return user;
         });
@@ -50,12 +56,7 @@ class AccountApi extends BaseApiService {
 
     return await network(
         request: (request) => request.get(
-              "/user",
-              options: Options(
-                headers: {
-                  'Authorization': 'Bearer $userToken',
-                },
-              ),
+              "/me",
             ),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
