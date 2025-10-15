@@ -118,9 +118,9 @@ class _SettingPageState extends NyState<SettingPage> {
       children: [
         CircleAvatar(
           radius: 50,
-          backgroundImage: _account?.avatar != null
-              ? NetworkImage(_account!.avatar!)
-              : AssetImage('public/assets/images/placeholder.jpg')
+          backgroundImage: _account?.image != null
+              ? NetworkImage(_account!.image!)
+              : AssetImage('public/assets/images/placeholder.png')
                   as ImageProvider,
           onBackgroundImageError: (_, __) {
             setState(() {});

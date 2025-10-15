@@ -2,6 +2,8 @@ import 'package:flutter_app/login_page.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/register_page.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
+import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
+import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
@@ -22,25 +24,25 @@ appRouter() => nyRoutes((router) {
       router.route(
         MainPage.path,
         (context) => MainPage(),
-        transition: PageTransitionType.rightToLeft,
+        transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
       router.route(
         DashboardPage.path,
         (context) => DashboardPage(),
-        transition: PageTransitionType.rightToLeft,
+        transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
       router.route(
         LoginPage.path,
         (context) => LoginPage(),
-        transition: PageTransitionType.bottomToTop,
+        transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
       router.route(
         SplashScreen.path,
         (context) => SplashScreen(),
-        transition: PageTransitionType.bottomToTop,
+        transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
       router.route(
@@ -70,6 +72,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         EditProductPage.path,
         (context) => EditProductPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ListIngredientPage.path,
+        (context) => ListIngredientPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditIngredientPage.path,
+        (context) => EditIngredientPage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

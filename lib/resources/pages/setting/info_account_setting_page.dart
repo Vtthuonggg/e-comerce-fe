@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/app/controllers/controller.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
+import 'package:flutter_app/app/networking/cloudinary_api.dart';
+import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
@@ -34,11 +36,13 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
   }
 
   _patchEditData() {
+    final userId = Auth.user<User>()?.id;
+    log(userId.toString());
     _formKey.currentState?.patchValue({
       'store_name': account.storeName ?? '',
       'name': account.name ?? '',
       'phone': account.phone ?? '',
-      'notes': account.note ?? '',
+      'address': account.address ?? '',
     });
   }
 
@@ -50,13 +54,13 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
       'store_name':
           _formKey.currentState?.fields['store_name']?.value.toString(),
       'name': _formKey.currentState?.fields['name']?.value.toString(),
-      'phone_number': _formKey.currentState?.fields['phone']?.value.toString(),
-      'notes': _formKey.currentState?.fields['notes']?.value.toString(),
+      'phone': _formKey.currentState?.fields['phone']?.value.toString(),
+      'address': _formKey.currentState?.fields['address']?.value.toString(),
     };
-    String? avatarUrl;
+    String? imageUrl;
     if (_imageFile != null) {
       try {
-        avatarUrl = await api<AccountApi>(
+        imageUrl = await api<CloudinaryApiService>(
             (request) => request.uploadImage(_imageFile!));
       } catch (e) {
         log(e.toString());
@@ -68,10 +72,10 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
         return;
       }
     }
-    if (avatarUrl != null) {
-      data['avatar'] = avatarUrl;
+    if (imageUrl != null) {
+      data['image'] = imageUrl;
     } else {
-      data['avatar'] = account.avatar;
+      data['image'] = account.image;
     }
     try {
       await api<AccountApi>((request) => request.updateInfoAccount(data));
@@ -79,8 +83,8 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
 
       Navigator.pop(context);
     } catch (e) {
-      log(e.toString());
-      CustomToast.showToastWarning(context, description: 'Cập nhật thất bại');
+      log(getResponseError(e));
+      CustomToast.showToastWarning(context, description: getResponseError(e));
     } finally {
       setState(() {
         _loading = false;
@@ -115,28 +119,32 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
             child: Column(
               children: [
                 15.verticalSpace,
-                buildAvatar(context),
+                buildimage(context),
                 15.verticalSpace,
                 FormBuilderTextField(
                   name: 'name',
+                  keyboardType: TextInputType.streetAddress,
                   initialValue: account.name,
                   decoration: InputDecoration(labelText: 'Tên'),
                 ),
                 15.verticalSpace,
                 FormBuilderTextField(
                   name: 'phone',
+                  enabled: false,
                   initialValue: account.phone,
                   decoration: InputDecoration(labelText: 'Số điện thoại'),
                 ),
                 15.verticalSpace,
                 FormBuilderTextField(
                   name: 'store_name',
+                  keyboardType: TextInputType.streetAddress,
                   decoration: InputDecoration(labelText: 'Tên cửa hàng'),
                 ),
                 15.verticalSpace,
                 FormBuilderTextField(
-                  name: 'notes',
-                  decoration: InputDecoration(labelText: 'Ghi chú'),
+                  name: 'address',
+                  keyboardType: TextInputType.streetAddress,
+                  decoration: InputDecoration(labelText: 'Địa chỉ'),
                 ),
                 15.verticalSpace,
                 SizedBox(
@@ -168,16 +176,16 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
     );
   }
 
-  Widget buildAvatar(context) {
+  Widget buildimage(context) {
     return Stack(
       children: [
         CircleAvatar(
           radius: 50,
           backgroundImage: _imageFile != null
               ? FileImage(_imageFile!)
-              : (account.avatar != null && account.avatar!.isNotEmpty
-                      ? NetworkImage(account.avatar!)
-                      : AssetImage('public/assets/images/placeholder.jpg'))
+              : (account.image != null && account.image!.isNotEmpty
+                      ? NetworkImage(account.image!)
+                      : AssetImage('public/assets/images/placeholder.png'))
                   as ImageProvider,
           onBackgroundImageError: (_, __) {
             setState(() {
