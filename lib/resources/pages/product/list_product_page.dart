@@ -6,6 +6,8 @@ import 'package:flutter_app/app/models/product.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
+import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
+import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
@@ -70,6 +72,13 @@ class _ListProductPageState extends NyState<ListProductPage> {
       appBar: GradientAppBar(
         title:
             Text('Menu món ăn', style: TextStyle(fontWeight: FontWeight.bold)),
+        actions: [
+          IconButton(
+              onPressed: () {
+                routeTo(ListCategoryPage.path);
+              },
+              icon: Icon(Icons.category))
+        ],
       ),
       body: SafeArea(
         child: RefreshIndicator(
@@ -97,7 +106,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
               ),
               itemBuilder: (context, item, index) => buildItem(item),
               noItemsFoundIndicatorBuilder: (_) =>
-                  Center(child: const Text("Không tìm thấy sản phẩm nào")),
+                  Center(child: const Text("Không tìm thấy món ăn nào")),
             ),
           ),
         ),
@@ -114,12 +123,26 @@ class _ListProductPageState extends NyState<ListProductPage> {
           children: [
             SpeedDialChild(
               child: const Icon(FontAwesomeIcons.plus),
-              backgroundColor: Colors.green,
+              backgroundColor: ThemeColor.get(context).primaryAccent,
               foregroundColor: Colors.white,
-              label: 'Thêm sản phẩm',
+              label: 'Thêm món ăn',
               onTap: () {
                 routeTo(
                   EditProductPage.path,
+                  onPop: (value) {
+                    _pagingController.refresh();
+                  },
+                );
+              },
+            ),
+            SpeedDialChild(
+              child: const Icon(Icons.category),
+              backgroundColor: ThemeColor.get(context).primaryAccent,
+              foregroundColor: Colors.white,
+              label: 'Thêm danh mục',
+              onTap: () {
+                routeTo(
+                  EditCategoryPage.path,
                   onPop: (value) {
                     _pagingController.refresh();
                   },

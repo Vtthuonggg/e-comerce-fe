@@ -50,8 +50,8 @@ class _EditProductPageState extends NyState<EditProductPage> {
 
         CustomToast.showToastSuccess(context,
             description: isEdit
-                ? "Cập nhật sản phẩm thành công"
-                : "Tạo sản phẩm thành công");
+                ? "Cập nhật món ăn thành công"
+                : "Tạo món ăn thành công");
         pop();
       } catch (e) {
         CustomToast.showToastError(context,
@@ -68,7 +68,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        title: Text(isEdit ? 'Chỉnh sửa sản phẩm' : 'Tạo sản phẩm'),
+        title: Text(isEdit ? 'Chỉnh sửa món ăn' : 'Tạo món ăn'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,17 +83,17 @@ class _EditProductPageState extends NyState<EditProductPage> {
                   name: 'name',
                   keyboardType: TextInputType.streetAddress,
                   decoration: InputDecoration(
-                    labelText: 'Tên sản phẩm *',
-                    hintText: 'Nhập tên sản phẩm',
+                    labelText: 'Tên món ăn *',
+                    hintText: 'Nhập tên món ăn',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
-                        errorText: 'Vui lòng nhập tên sản phẩm'),
+                        errorText: 'Vui lòng nhập tên món ăn'),
                     FormBuilderValidators.maxLength(255,
-                        errorText: 'Tên sản phẩm không được quá 255 ký tự'),
+                        errorText: 'Tên món ăn không được quá 255 ký tự'),
                   ]),
                 ),
 
@@ -184,11 +184,11 @@ class _EditProductPageState extends NyState<EditProductPage> {
 
                 SizedBox(height: 16),
 
-                // Loại sản phẩm
+                // Loại món ăn
                 FormBuilderRadioGroup<int>(
                   name: 'type',
                   decoration: InputDecoration(
-                    labelText: 'Loại sản phẩm *',
+                    labelText: 'Loại món ăn *',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -199,7 +199,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
                     FormBuilderFieldOption(value: 2, child: Text('Loại 2')),
                   ],
                   validator: FormBuilderValidators.required(
-                      errorText: 'Vui lòng chọn loại sản phẩm'),
+                      errorText: 'Vui lòng chọn loại món ăn'),
                 ),
 
                 SizedBox(height: 24),
@@ -233,7 +233,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
                           ],
                         )
                       : Text(
-                          isEdit ? 'Cập nhật sản phẩm' : 'Tạo sản phẩm',
+                          isEdit ? 'Cập nhật món ăn' : 'Tạo món ăn',
                           style: TextStyle(fontSize: 16),
                         ),
                 ),

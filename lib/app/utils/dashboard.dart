@@ -101,7 +101,7 @@ extension DashboardItemExtension on DashboardItem {
       case DashboardItem.CashBook:
         return MainPage.path;
       case DashboardItem.Employee:
-        return MainPage.path;
+        return ListEmployeePage.path;
       case DashboardItem.Customer:
         return MainPage.path;
       case DashboardItem.Supplier:

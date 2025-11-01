@@ -24,7 +24,7 @@ class _RegisterPageState extends NyState<RegisterPage> {
   bool _isPasswordVisible = false;
   String _errorMessage = '';
   TextEditingController _nameController = TextEditingController();
-  TextEditingController _emailController = TextEditingController();
+  TextEditingController _phoneController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _confirmPasswordController = TextEditingController();
 
@@ -35,7 +35,7 @@ class _RegisterPageState extends NyState<RegisterPage> {
   }
 
   _register() async {
-    if (_emailController.text == '' || _passwordController.text == '') {
+    if (_phoneController.text == '' || _passwordController.text == '') {
       setState(() {
         _errorMessage = 'Vui lòng nhập đầy đủ thông tin';
       });
@@ -52,7 +52,7 @@ class _RegisterPageState extends NyState<RegisterPage> {
     });
     final payload = {
       'name': _nameController.text,
-      'email': _emailController.text,
+      'phone': _phoneController.text,
       'password': _passwordController.text,
       'user_type': 2,
     };
@@ -116,14 +116,14 @@ class _RegisterPageState extends NyState<RegisterPage> {
                     )),
               ),
               TextField(
-                controller: _emailController,
+                controller: _phoneController,
                 cursorColor: context.color.primaryAccent,
                 onTapOutside: (event) {
                   FocusScope.of(context).unfocus();
                 },
                 decoration: InputDecoration(
-                    labelText: 'Tài khoản',
-                    hintText: 'Nhập tài khoản',
+                    labelText: 'Số điện thoại',
+                    hintText: 'VD: 0987654321',
                     floatingLabelStyle: TextStyle(
                       color: context.color.primaryAccent,
                     ),

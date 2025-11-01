@@ -5,7 +5,7 @@
 # Author: Anthony Gordon <https://github.com/agordn52>
 
 name: flutter_app
-description: Aibat, phần mềm quản lý bán hàng
+description: Phần mềm quản lý nhà hàng
 publish_to: none # Remove this line if you wish to publish to pub.dev
 # To change version, use git tag command and push to remote (git push --tags)
 # version: 99.99.99+99

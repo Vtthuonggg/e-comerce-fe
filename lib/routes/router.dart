@@ -1,6 +1,8 @@
 import 'package:flutter_app/login_page.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/register_page.dart';
+import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
+import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
@@ -84,6 +86,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         EditIngredientPage.path,
         (context) => EditIngredientPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditCategoryPage.path,
+        (context) => EditCategoryPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ListCategoryPage.path,
+        (context) => ListCategoryPage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

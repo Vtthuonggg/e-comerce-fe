@@ -138,7 +138,7 @@ class _MainPageState extends State<MainPage> {
           textStyle: TextStyle(
               color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
-          title: 'Sản phẩm',
+          title: 'Món ăn',
           icon: Icon(
             FontAwesomeIcons.store,
             color: activeColor,

@@ -1,3 +1,4 @@
+import 'package:flutter_app/app/networking/category_api.dart';
 import 'package:flutter_app/app/networking/cloudinary_api.dart';
 import 'package:flutter_app/app/networking/dio/base_api_service.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
@@ -35,6 +36,7 @@ final Map<Type, BaseApiService> apiDecoders = {
   AccountApi: AccountApi(),
   ProductApiService: ProductApiService(),
   CloudinaryApiService: CloudinaryApiService(),
+  CategoryApiService: CategoryApiService(),
 
   // ...
 };

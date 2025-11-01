@@ -23,7 +23,7 @@ class User extends Model {
     storeName = data['store_name'];
     address = data['address'];
     image = data['image'];
-    type = data['user_type'];
+    type = data['user_type'] ?? 2;
     apiKey = data['api_key'];
   }
 
