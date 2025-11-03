@@ -3,6 +3,8 @@ import 'package:flutter_app/main.dart';
 import 'package:flutter_app/register_page.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
+import 'package:flutter_app/resources/pages/customer/edit_customer_page.dart';
+import 'package:flutter_app/resources/pages/customer/list_customer_page.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
 import 'package:flutter_app/resources/pages/employee/edit_employee_page.dart';
 import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
@@ -107,6 +109,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         OrderListAllPage.path,
         (context) => OrderListAllPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditCustomerPage.path,
+        (context) => EditCustomerPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ListCustomerPage.path,
+        (context) => ListCustomerPage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

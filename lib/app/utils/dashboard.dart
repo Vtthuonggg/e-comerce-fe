@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/models/user.dart';
+import 'package:flutter_app/resources/pages/customer/list_customer_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
@@ -107,7 +108,7 @@ extension DashboardItemExtension on DashboardItem {
       case DashboardItem.Employee:
         return MainPage.path;
       case DashboardItem.Customer:
-        return MainPage.path;
+        return ListCustomerPage.path;
       case DashboardItem.Supplier:
         return MainPage.path;
       case DashboardItem.Report:

@@ -15,7 +15,8 @@ class _OrderListAllPageState extends NyState<OrderListAllPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        title: Text('Danh sách đơn hàng'),
+        title: Text('Danh sách đơn hàng',
+            style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: Center(
         child: Text('Danh sách tất cả đơn hàng'),

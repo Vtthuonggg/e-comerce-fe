@@ -6,8 +6,8 @@ import 'package:flutter_app/app/networking/dio/interceptors/bearer_auth_intercep
 import 'package:flutter_app/app/networking/logging_interceptor.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-class IngredientApiService extends BaseApiService {
-  IngredientApiService({BuildContext? buildContext}) : super(buildContext);
+class CustomerApiService extends BaseApiService {
+  CustomerApiService({BuildContext? buildContext}) : super(buildContext);
 
   @override
   String get baseUrl => getEnv('API_BASE_URL');
@@ -18,7 +18,7 @@ class IngredientApiService extends BaseApiService {
     LoggingInterceptor: LoggingInterceptor()
   };
 
-  Future<dynamic> listIngredient(String? name, int page, int size,
+  Future<dynamic> listCustomer(String? name, int page, int size,
       {int? storeId}) async {
     var queryParameters = {
       "name": name,
@@ -30,7 +30,7 @@ class IngredientApiService extends BaseApiService {
     }
     return await network(
       request: (request) =>
-          request.get("/ingredient", queryParameters: queryParameters),
+          request.get("/customer", queryParameters: queryParameters),
       handleFailure: (error) {
         throw error;
       },
@@ -41,36 +41,36 @@ class IngredientApiService extends BaseApiService {
     );
   }
 
-  Future createIngredient(dynamic data) async {
+  Future createCustomer(dynamic data) async {
     return await network(
-        request: (request) => request.post("/ingredient", data: data),
+        request: (request) => request.post("/customer", data: data),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           return response.data;
         });
   }
 
-  Future updateIngredient(int id, dynamic data) async {
+  Future updateCustomer(int id, dynamic data) async {
     return await network(
-        request: (request) => request.put("/ingredient/$id", data: data),
+        request: (request) => request.put("/customer/$id", data: data),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           return response.data;
         });
   }
 
-  Future deleteIngredient(int id) async {
+  Future deleteCustomer(int id) async {
     return await network(
-        request: (request) => request.delete("/ingredient/$id"),
+        request: (request) => request.delete("/customer/$id"),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           return response.data;
         });
   }
 
-  Future detailIngredient(int id) async {
+  Future detailCustomer(int id) async {
     return await network(
-        request: (request) => request.get("/ingredient/$id"),
+        request: (request) => request.get("/customer/$id"),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
           return response.data;

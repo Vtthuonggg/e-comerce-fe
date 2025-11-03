@@ -10,6 +10,7 @@ import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
+import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -30,6 +31,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
   String searchQuery = '';
   int _pageSize = 20;
   int _total = 0;
+
   @override
   void initState() {
     super.initState();
@@ -48,6 +50,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
                 1,
               ));
       setState(() {
+        _total = newItems['meta']?['total'] ?? 0;
         List<Product> products = [];
         newItems["data"].forEach((item) {
           products.add(Product.fromJson(item));
@@ -66,6 +69,179 @@ class _ListProductPageState extends NyState<ListProductPage> {
     }
   }
 
+  Widget buildItem(Product product) {
+    return Column(
+      children: [
+        InkWell(
+          onTap: () => routeTo(EditProductPage.path, data: {'data': product},
+              onPop: (_) {
+            _pagingController.refresh();
+          }),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                _buildProductImage(product),
+                const SizedBox(width: 16),
+                Expanded(child: _buildProductInfo(product)),
+                _buildPopupMenu(product),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Divider(height: 1, color: Colors.grey[300]),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductImage(Product product) {
+    final dynamic img = (product as dynamic).image;
+    final bool hasImage = img != null && img.toString().isNotEmpty;
+
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: hasImage ? null : Colors.grey.shade100,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: hasImage
+            ? Image.network(
+                img.toString(),
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    _buildPlaceholderImage(),
+              )
+            : _buildPlaceholderImage(),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholderImage() {
+    return Container(
+      width: 80,
+      height: 80,
+      color: Colors.grey.shade100,
+      child: Icon(
+        Icons.fastfood_outlined,
+        color: Colors.grey.shade400,
+        size: 32,
+      ),
+    );
+  }
+
+  Widget _buildProductInfo(Product product) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          product.name ?? 'Không có tên',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 8),
+        _buildPriceInfo(product),
+      ],
+    );
+  }
+
+  Widget _buildPriceInfo(Product product) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (product.baseCost != null)
+          Text('Giá gốc: ${product.baseCost}',
+              style: TextStyle(color: Colors.grey[700], fontSize: 13)),
+        if (product.retailCost != null)
+          Text('Giá bán: ${product.retailCost}',
+              style: TextStyle(
+                  color: Colors.green[700],
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500)),
+      ],
+    );
+  }
+
+  Widget _buildPopupMenu(Product product) {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.more_vert, color: Colors.grey[600], size: 20),
+      onSelected: (value) {
+        if (value == 'edit') {
+          routeTo(EditProductPage.path, data: {'data': product}, onPop: (_) {
+            _pagingController.refresh();
+          });
+        } else if (value == 'delete') {
+          _showDeleteConfirmationDialog(product);
+        }
+      },
+      itemBuilder: (context) => [
+        const PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit, size: 18, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('Sửa'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete, size: 18, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Xóa'),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteConfirmationDialog(Product product) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Xác nhận xóa'),
+          content: const Text('Bạn có chắc chắn muốn xóa món ăn này không?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Hủy'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                try {
+                  await api<ProductApiService>(
+                      (request) => request.deleteProduct(product.id!));
+                  CustomToast.showToastSuccess(context,
+                      description: 'Xóa món ăn thành công');
+                  _pagingController.refresh();
+                } catch (error) {
+                  log(error.toString());
+                  CustomToast.showToastError(context,
+                      description: getResponseError(error));
+                }
+              },
+              child: const Text('Xóa', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,34 +257,66 @@ class _ListProductPageState extends NyState<ListProductPage> {
         ],
       ),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            _pagingController.refresh();
-          },
-          child: PagedListView<int, dynamic>(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<dynamic>(
-              firstPageErrorIndicatorBuilder: (context) => Center(
-                child: Text(getResponseError(_pagingController.error)),
-              ),
-              newPageErrorIndicatorBuilder: (context) => Center(
-                child: Text(getResponseError(_pagingController.error)),
-              ),
-              firstPageProgressIndicatorBuilder: (context) => Center(
-                child: CircularProgressIndicator(
-                  color: ThemeColor.get(context).primaryAccent,
+        child: Column(
+          children: [
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+              child: TextField(
+                onChanged: (value) {
+                  setState(() => searchQuery = value);
+                  Future.delayed(const Duration(milliseconds: 500), () {
+                    if (mounted) _pagingController.refresh();
+                  });
+                },
+                decoration: InputDecoration(
+                  hintText: 'Tìm kiếm món ăn',
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide.none),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
                 ),
               ),
-              newPageProgressIndicatorBuilder: (context) => Center(
-                child: CircularProgressIndicator(
-                  color: ThemeColor.get(context).primaryAccent,
-                ),
-              ),
-              itemBuilder: (context, item, index) => buildItem(item),
-              noItemsFoundIndicatorBuilder: (_) =>
-                  Center(child: const Text("Không tìm thấy món ăn nào")),
             ),
-          ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Tổng: $_total'),
+                  const SizedBox(width: 8),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: RefreshIndicator(
+                color: ThemeColor.get(context).primaryAccent,
+                onRefresh: () => Future.sync(() => _pagingController.refresh()),
+                child: PagedListView<int, dynamic>(
+                  pagingController: _pagingController,
+                  builderDelegate: PagedChildBuilderDelegate<dynamic>(
+                    firstPageErrorIndicatorBuilder: (context) => Center(
+                        child: Text(getResponseError(_pagingController.error))),
+                    newPageErrorIndicatorBuilder: (context) => Center(
+                        child: Text(getResponseError(_pagingController.error))),
+                    firstPageProgressIndicatorBuilder: (context) => Center(
+                        child: CircularProgressIndicator(
+                            color: ThemeColor.get(context).primaryAccent)),
+                    newPageProgressIndicatorBuilder: (context) => Center(
+                        child: CircularProgressIndicator(
+                            color: ThemeColor.get(context).primaryAccent)),
+                    itemBuilder: (context, item, index) => buildItem(item),
+                    noItemsFoundIndicatorBuilder: (_) =>
+                        const Center(child: Text("Không tìm thấy món ăn nào")),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
         ),
       ),
       floatingActionButton: DraggableFab(
@@ -152,14 +360,6 @@ class _ListProductPageState extends NyState<ListProductPage> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget buildItem(Product product) {
-    return ListTile(
-      title: Text(product.name ?? 'No name'),
-      subtitle: Text(
-          'Giá bán: ${product.retailCost}, Giá gốc: ${product.baseCost}, Tồn kho: ${product.stock}'),
     );
   }
 }

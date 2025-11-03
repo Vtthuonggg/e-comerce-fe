@@ -19,13 +19,13 @@ class Product extends Model {
   });
 
   Product.fromJson(dynamic data) {
+    id = data['id'];
     name = data['name'];
     retailCost = data['retail_cost'];
     baseCost = data['base_cost'];
     stock = data['stock'];
     categoryId = data['category_id'];
     image = data['image'];
-    id = data['id'];
   }
 
   @override

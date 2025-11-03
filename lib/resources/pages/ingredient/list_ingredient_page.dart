@@ -27,19 +27,12 @@ class _ListIngredientPageState extends NyState<ListIngredientPage> {
   int _pageSize = 20;
   int _total = 0;
 
-  // New state for PageView UI
-  final PageController _pageController = PageController(viewportFraction: 0.86);
-  List<Ingredient> _items = [];
-  bool _loading = false;
-
   @override
   void initState() {
     super.initState();
     _pagingController.addPageRequestListener((pageKey) {
       _fetchData(pageKey);
     });
-
-    // load first page for PageView
   }
 
   _fetchData(int pageKey) async {
@@ -49,10 +42,10 @@ class _ListIngredientPageState extends NyState<ListIngredientPage> {
                 searchQuery,
                 pageKey,
                 _pageSize,
-                1,
               ));
       setState(() {
         List<Ingredient> products = [];
+        _total = newItems['meta']?['total'] ?? 0;
         newItems["data"].forEach((item) {
           products.add(Ingredient.fromJson(item));
         });

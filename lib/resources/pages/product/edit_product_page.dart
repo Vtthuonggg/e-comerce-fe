@@ -70,7 +70,8 @@ class _EditProductPageState extends NyState<EditProductPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        title: Text(isEdit ? 'Chỉnh sửa món ăn' : 'Tạo món ăn'),
+        title: Text(isEdit ? 'Chỉnh sửa món ăn' : 'Tạo món ăn',
+            style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
