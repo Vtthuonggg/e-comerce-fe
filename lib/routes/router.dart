@@ -4,6 +4,8 @@ import 'package:flutter_app/register_page.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
+import 'package:flutter_app/resources/pages/employee/edit_employee_page.dart';
+import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
@@ -98,6 +100,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         ListCategoryPage.path,
         (context) => ListCategoryPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditEmployeePage.path,
+        (context) => EditEmployeePage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ListEmployeePage.path,
+        (context) => ListEmployeePage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

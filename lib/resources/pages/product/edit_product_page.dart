@@ -1,5 +1,6 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/app/controllers/controller.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
@@ -11,6 +12,7 @@ import 'package:nylo_framework/nylo_framework.dart';
 
 class EditProductPage extends NyStatefulWidget {
   static const path = '/edit_product';
+  final controller = Controller();
   EditProductPage({Key? key}) : super(key: key);
 
   @override

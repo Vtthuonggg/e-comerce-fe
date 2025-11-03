@@ -1,6 +1,7 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
-import 'package:nylo_framework/nylo_framework.dart' hide event;
+import 'package:nylo_framework/nylo_framework.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/controllers/controller.dart';
@@ -39,6 +40,24 @@ class _LoginPageState extends NyState<LoginPage> {
       });
       return;
     }
+    try {
+      // nếu bạn dùng host khác, đổi '192.168.1.10' thành host tương ứng
+      final result = await InternetAddress.lookup('192.168.1.10');
+      if (result.isEmpty || result[0].rawAddress.isEmpty) {
+        setState(() {
+          _errorMessage = 'Không thể kết nối tới server';
+        });
+        CustomToast.showToastError(context, description: _errorMessage);
+        return;
+      }
+    } on SocketException catch (_) {
+      setState(() {
+        _errorMessage =
+            'Không có kết nối mạng đến server. Kiểm tra Wi-Fi / firewall / permission.';
+      });
+      CustomToast.showToastError(context, description: _errorMessage);
+      return;
+    }
     _errorMessage = '';
     setState(() {
       _loading = true;
@@ -56,6 +75,7 @@ class _LoginPageState extends NyState<LoginPage> {
       CustomToast.showToastSuccess(context,
           description: "Đăng nhập thành công");
     } catch (e) {
+      log(e.toString());
       setState(() {
         _errorMessage = 'Tài khoản hoặc mật khẩu không đúng';
       });
@@ -104,8 +124,8 @@ class _LoginPageState extends NyState<LoginPage> {
                   FocusScope.of(context).unfocus();
                 },
                 decoration: InputDecoration(
-                    labelText: 'Tài khoản',
-                    hintText: 'Nhập tài khoản',
+                    labelText: 'Số điện thoại',
+                    hintText: 'VD: 0987654321',
                     floatingLabelStyle: TextStyle(
                       color: context.color.primaryAccent,
                     ),
