@@ -6,6 +6,7 @@ import 'package:flutter_app/app/controllers/controller.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/app/networking/cloudinary_api.dart';
+import 'package:flutter_app/app/utils/cloudinary.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
@@ -60,8 +61,7 @@ class _InfoSettingPageState extends State<InfoSettingPage> {
     String? imageUrl;
     if (_imageFile != null) {
       try {
-        imageUrl = await api<CloudinaryApiService>(
-            (request) => request.uploadImage(_imageFile!));
+        imageUrl = await getImageCloudinaryUrl(_imageFile!);
       } catch (e) {
         log(e.toString());
         CustomToast.showToastWarning(context,

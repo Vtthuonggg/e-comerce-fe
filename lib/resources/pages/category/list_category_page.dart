@@ -7,6 +7,7 @@ import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
+import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -64,7 +65,7 @@ class _ListCategoryPageState extends NyState<ListCategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: GradientAppBar(
           title: Text(
             "Quản lý danh mục",
             style: TextStyle(

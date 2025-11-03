@@ -9,6 +9,7 @@ import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
+import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
@@ -100,6 +101,12 @@ appRouter() => nyRoutes((router) {
       router.route(
         ListCategoryPage.path,
         (context) => ListCategoryPage(),
+        transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        OrderListAllPage.path,
+        (context) => OrderListAllPage(),
         transition: PageTransitionType.rightToLeft,
         pageTransitionSettings: const PageTransitionSettings(),
       );

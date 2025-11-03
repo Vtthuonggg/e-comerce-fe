@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/common_define.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
+import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/setting_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -112,6 +113,7 @@ class _MainPageState extends State<MainPage> {
   List<Widget> _buildScreens() {
     return [
       DashboardPage(key: _homeNavKey),
+      OrderListAllPage(key: _orderNavKey),
       ListProductPage(key: _productNavKey),
       SettingPage(
         key: _accountNavKey,
@@ -131,6 +133,17 @@ class _MainPageState extends State<MainPage> {
           ),
           inactiveIcon: Icon(
             Icons.home_filled,
+            color: inactiveColor,
+          ),
+          activeColorPrimary: activeColor,
+          inactiveColorPrimary: inactiveColor,
+          textStyle: TextStyle(
+              color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
+      PersistentBottomNavBarItem(
+          title: 'Đơn hàng',
+          icon: Icon(Icons.fact_check, color: activeColor),
+          inactiveIcon: Icon(
+            Icons.fact_check_outlined,
             color: inactiveColor,
           ),
           activeColorPrimary: activeColor,

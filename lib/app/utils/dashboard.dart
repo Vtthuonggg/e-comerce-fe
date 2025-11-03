@@ -2,8 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/models/user.dart';
+import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
+import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 enum DashboardItem {
@@ -11,7 +14,7 @@ enum DashboardItem {
   OrderList,
   OrderPurchase,
   OrderSale,
-  Service,
+  Ingredient,
   Storage,
   CashBook,
   Employee,
@@ -32,8 +35,8 @@ extension DashboardItemExtension on DashboardItem {
         return 'Nhập hàng';
       case DashboardItem.OrderSale:
         return 'Bán hàng';
-      case DashboardItem.Service:
-        return 'Dịch vụ';
+      case DashboardItem.Ingredient:
+        return 'Nguyên Liệu';
       case DashboardItem.Storage:
         return 'Kho';
       case DashboardItem.CashBook:
@@ -64,8 +67,8 @@ extension DashboardItemExtension on DashboardItem {
         return Icons.local_shipping; // Icon nhập hàng
       case DashboardItem.OrderSale:
         return Icons.point_of_sale; // Icon bán hàng/thu ngân
-      case DashboardItem.Service:
-        return Icons.restaurant_menu; // Icon dịch vụ nhà hàng
+      case DashboardItem.Ingredient:
+        return FontAwesomeIcons.carrot; // Icon nguyên liệu
       case DashboardItem.Storage:
         return Icons.inventory; // Icon kho
       case DashboardItem.CashBook:
@@ -90,19 +93,19 @@ extension DashboardItemExtension on DashboardItem {
       case DashboardItem.Table:
         return MainPage.path;
       case DashboardItem.OrderList:
-        return MainPage.path;
+        return OrderListAllPage.path;
       case DashboardItem.OrderPurchase:
         return MainPage.path;
       case DashboardItem.OrderSale:
         return MainPage.path;
-      case DashboardItem.Service:
-        return MainPage.path;
+      case DashboardItem.Ingredient:
+        return ListIngredientPage.path;
       case DashboardItem.Storage:
         return MainPage.path;
       case DashboardItem.CashBook:
         return MainPage.path;
       case DashboardItem.Employee:
-        return ListEmployeePage.path;
+        return MainPage.path;
       case DashboardItem.Customer:
         return MainPage.path;
       case DashboardItem.Supplier:
@@ -125,7 +128,7 @@ List<DashboardItem> getDashboardItems() {
         DashboardItem.Table,
         DashboardItem.OrderList,
         DashboardItem.OrderSale,
-        DashboardItem.Service,
+        DashboardItem.Ingredient,
         DashboardItem.Storage,
         DashboardItem.CashBook,
         DashboardItem.Employee,
@@ -138,7 +141,7 @@ List<DashboardItem> getDashboardItems() {
         DashboardItem.Table,
         DashboardItem.OrderList,
         DashboardItem.OrderSale,
-        DashboardItem.Service,
+        DashboardItem.Ingredient,
         DashboardItem.Storage,
         DashboardItem.CashBook,
         DashboardItem.Employee,

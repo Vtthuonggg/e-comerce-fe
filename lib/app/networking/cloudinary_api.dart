@@ -21,7 +21,6 @@ class CloudinaryApiService extends BaseApiService {
         request: (request) => request.post("/image/upload", data: formData),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
-          log(response.data.toString());
           return response.data['url'];
         });
   }

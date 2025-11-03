@@ -6,6 +6,7 @@ import 'package:flutter_app/app/networking/category_api.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:nylo_framework/nylo_framework.dart';
@@ -82,7 +83,7 @@ class _EditCategoryPageState extends NyState<EditCategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: GradientAppBar(
         title: Text(
           isEditing ? "Sửa danh mục" : "Tạo danh mục",
           style: TextStyle(
