@@ -8,6 +8,7 @@ import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:iconsax/iconsax.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 enum DashboardItem {
@@ -61,27 +62,27 @@ extension DashboardItemExtension on DashboardItem {
   dynamic get icon {
     switch (this) {
       case DashboardItem.Table:
-        return Icons.table_restaurant; // Icon bàn nhà hàng
+        return Iconsax.category; // Icon bàn nhà hàng
       case DashboardItem.OrderList:
-        return Icons.list_alt; // Icon danh sách đơn hàng
+        return Iconsax.task; // Icon danh sách đơn hàng
       case DashboardItem.OrderPurchase:
-        return Icons.local_shipping; // Icon nhập hàng
+        return Iconsax.import_3; // Icon nhập hàng
       case DashboardItem.OrderSale:
-        return Icons.point_of_sale; // Icon bán hàng/thu ngân
+        return Iconsax.export_3; // Icon bán hàng/thu ngân
       case DashboardItem.Ingredient:
         return FontAwesomeIcons.carrot; // Icon nguyên liệu
       case DashboardItem.Storage:
-        return Icons.inventory; // Icon kho
+        return Iconsax.archive; // Icon kho
       case DashboardItem.CashBook:
-        return Icons.account_balance_wallet; // Icon sổ quỹ
+        return Iconsax.group; // Icon sổ quỹ
       case DashboardItem.Employee:
-        return Icons.people; // Icon nhân viên
+        return Iconsax.tag_user; // Icon nhân viên
       case DashboardItem.Customer:
-        return Icons.group; // Icon khách hàng
+        return Iconsax.people; // Icon khách hàng
       case DashboardItem.Supplier:
-        return Icons.business; // Icon nhà cung cấp
+        return Iconsax.user_octagon; // Icon nhà cung cấp
       case DashboardItem.Report:
-        return Icons.analytics; // Icon báo cáo
+        return Iconsax.status_up; // Icon báo cáo
       case DashboardItem.TimekeepingCreate:
         return Icons.access_time; // Icon chấm công
       default:

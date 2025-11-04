@@ -115,6 +115,8 @@ dependencies:
   sunmi_printer_plus: ^2.1.01
   flutter_html_to_pdf_updated: ^1.0.0
   uuid: ^3.0.5
+  iconsax: ^0.0.8
+  iconly: ^1.0.1
 #  flutter_html_to_pdf: ^0.7.0
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1
