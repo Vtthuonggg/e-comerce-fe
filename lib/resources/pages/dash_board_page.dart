@@ -1,13 +1,17 @@
 import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/utils/dashboard.dart';
+import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/constant.dart';
+import 'package:flutter_app/resources/pages/report/report_page.dart';
+import 'package:flutter_app/resources/themes/styles/color_styles.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,7 +24,9 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends State<DashboardPage>
+    with SingleTickerProviderStateMixin {
+  User get user => Auth.user<User>()!;
   @override
   Widget build(BuildContext context) {
     var shortestSide = MediaQuery.of(context).size.shortestSide;
@@ -79,7 +85,7 @@ class _DashboardPageState extends State<DashboardPage> {
       body: Stack(
         children: [
           Container(
-            height: 105.h,
+            height: 105,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                   colors: [Color(0xff179A6E), Color(0xff34B362)]),
@@ -94,109 +100,11 @@ class _DashboardPageState extends State<DashboardPage> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-                  Container(
-                    width: 1.sh,
-                    height: 221.w,
-                    padding: EdgeInsets.all(20.w),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 30,
-                          offset: Offset(0, 1),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Xin chào ${Auth.user()?.name}',
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 113,
-                        width: 116,
-                        padding: EdgeInsets.symmetric(vertical: 16.w),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Color(0xff028175), Color(0xff35B562)],
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color(0xff0D9A6F).withOpacity(0.35),
-                              blurRadius: 30,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Icon(Iconsax.import_2,
-                                size: 30.w, color: Colors.white),
-                            SizedBox(height: 8),
-                            Text(
-                              'Nhập',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 10),
-                      Expanded(
-                        child: Container(
-                          height: 113,
-                          padding: EdgeInsets.symmetric(
-                              vertical: 20.w, horizontal: 40.w),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xff028175), Color(0xff35B562)],
-                            ),
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Color(0xff0D9A6F).withOpacity(0.35),
-                                blurRadius: 30,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Icon(Iconsax.export_3,
-                                  size: 30.w, color: Colors.white),
-                              Text(
-                                'Bán hàng',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(height: 20),
+                  buildInfoCard(),
                   Expanded(
                     child: ListView(
                       children: [
+                        buildOrderButtons(),
                         GridView.count(
                             physics: NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
@@ -227,6 +135,242 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildInfoCard() {
+    return Container(
+      width: 1.sw,
+      padding: const EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            offset: const Offset(0, 1),
+            blurRadius: 30,
+            spreadRadius: 0,
+          ),
+        ],
+      ),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Xin chào: ${user.name}',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Divider(
+              color: HexColor.fromHex('#EAEAEA'),
+              height: 12,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          IconsaxPlusLinear.chart_1,
+                          size: 24,
+                          color: Color(0xffE28B00),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        Text(
+                          'Doanh số hôm nay',
+                          style: TextStyle(
+                            color: Color(0xff5C5C5C),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 10,
+                    ),
+                    Text(vnd.format(1000000 ?? 0).replaceAll('.', ','),
+                        style: TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: ThemeColor.get(context).primaryAccent))
+                  ],
+                ),
+                IconButton(
+                    onPressed: () {
+                      routeTo(ReportPage.path);
+                    },
+                    icon: Icon(Icons.arrow_forward_ios,
+                        size: 16, color: ThemeColor.get(context).primaryAccent))
+              ],
+            ),
+            Divider(
+              color: HexColor.fromHex('#EAEAEA'),
+              height: 3,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tuần này',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff5C5C5C)),
+                    ),
+                    Text(
+                      vnd.format(74390000).replaceAll('.', ','),
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Tháng này',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xff5C5C5C)),
+                    ),
+                    Text(
+                      vnd.format(348960005000).replaceAll('.', ','),
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                  ],
+                )
+              ],
+            )
+          ]),
+    );
+  }
+
+  Widget buildOrderButtons() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: IntrinsicHeight(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              flex: 9,
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
+                    // routeTo(AddStoragePage.path);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xff028175), Color(0xff35B562)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xff0D9A6F).withOpacity(0.20),
+                          blurRadius: 18,
+                          spreadRadius: 0,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(IconsaxPlusLinear.import_1,
+                            size: 24, color: Colors.white),
+                        SizedBox(height: 6),
+                        Text(
+                          'Nhập',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 19,
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () {
+                    // routeTo(ManageTablePage.path);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Color(0xff028175), Color(0xff35B562)],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xff0D9A6F).withOpacity(0.20),
+                          blurRadius: 18,
+                          spreadRadius: 0,
+                          offset: Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SvgPicture.asset(
+                          getImageAsset('svg/table.svg'),
+                          width: 30,
+                          height: 30,
+                          colorFilter:
+                              ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ),
+                        Flexible(
+                          child: Text(
+                            "Xem bàn",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -293,43 +437,4 @@ class _DashboardPageState extends State<DashboardPage> {
       throw Exception('Could not launch $url');
     }
   }
-}
-
-class CurvedHeader extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        ClipPath(
-          clipper: HeaderClipper(),
-          child: Container(
-            height: 180,
-            color: const Color(0xFF00A86B), // màu xanh gradient hoặc 1 màu
-          ),
-        ),
-        AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          title: const Text("Ốc Cafe"),
-          centerTitle: false,
-        ),
-      ],
-    );
-  }
-}
-
-class HeaderClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(0, size.height - 40);
-    path.quadraticBezierTo(
-        size.width / 2, size.height, size.width, size.height - 40);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

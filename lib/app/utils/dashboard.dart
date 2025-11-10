@@ -8,35 +8,25 @@ import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:iconly/iconly.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 enum DashboardItem {
-  Table,
-  OrderList,
-  OrderPurchase,
-  OrderSale,
-  Ingredient,
+  Service,
+  Product,
   Storage,
   CashBook,
   Employee,
   Customer,
   Supplier,
-  Report,
-  TimekeepingCreate,
+  Ingredient,
+  Plus,
 }
 
 extension DashboardItemExtension on DashboardItem {
   String get name {
     switch (this) {
-      case DashboardItem.Table:
-        return 'Bàn';
-      case DashboardItem.OrderList:
-        return 'Đơn hàng';
-      case DashboardItem.OrderPurchase:
-        return 'Nhập hàng';
-      case DashboardItem.OrderSale:
-        return 'Bán hàng';
       case DashboardItem.Ingredient:
         return 'Nguyên Liệu';
       case DashboardItem.Storage:
@@ -49,11 +39,7 @@ extension DashboardItemExtension on DashboardItem {
         return 'Khách hàng';
       case DashboardItem.Supplier:
         return 'Nhà cung cấp';
-      case DashboardItem.Report:
-        return 'Báo cáo';
 
-      case DashboardItem.TimekeepingCreate:
-        return 'Chấm công';
       default:
         return '';
     }
@@ -61,45 +47,31 @@ extension DashboardItemExtension on DashboardItem {
 
   dynamic get icon {
     switch (this) {
-      case DashboardItem.Table:
-        return Iconsax.category; // Icon bàn nhà hàng
-      case DashboardItem.OrderList:
-        return Iconsax.task; // Icon danh sách đơn hàng
-      case DashboardItem.OrderPurchase:
-        return Iconsax.import_3; // Icon nhập hàng
-      case DashboardItem.OrderSale:
-        return Iconsax.export_3; // Icon bán hàng/thu ngân
-      case DashboardItem.Ingredient:
-        return FontAwesomeIcons.carrot; // Icon nguyên liệu
+      case DashboardItem.Service:
+        return IconsaxPlusLinear.receipt_1; // store
+
       case DashboardItem.Storage:
-        return Iconsax.archive; // Icon kho
+        return IconsaxPlusLinear.archive;
       case DashboardItem.CashBook:
-        return Iconsax.group; // Icon sổ quỹ
+        return IconsaxPlusLinear.convert_card;
       case DashboardItem.Employee:
-        return Iconsax.tag_user; // Icon nhân viên
+        return IconsaxPlusLinear.tag_user;
       case DashboardItem.Customer:
-        return Iconsax.people; // Icon khách hàng
+        return IconsaxPlusLinear.people;
       case DashboardItem.Supplier:
-        return Iconsax.user_octagon; // Icon nhà cung cấp
-      case DashboardItem.Report:
-        return Iconsax.status_up; // Icon báo cáo
-      case DashboardItem.TimekeepingCreate:
-        return Icons.access_time; // Icon chấm công
+        return IconsaxPlusLinear.user_octagon;
+
+      case DashboardItem.Plus:
+        return IconlyLight.plus;
+      case DashboardItem.Product:
+        return Icons.inventory_2_outlined;
       default:
-        return Icons.help_outline;
+        return IconsaxPlusLinear.home_2;
     }
   }
 
   String? get routePath {
     switch (this) {
-      case DashboardItem.Table:
-        return MainPage.path;
-      case DashboardItem.OrderList:
-        return OrderListAllPage.path;
-      case DashboardItem.OrderPurchase:
-        return MainPage.path;
-      case DashboardItem.OrderSale:
-        return MainPage.path;
       case DashboardItem.Ingredient:
         return ListIngredientPage.path;
       case DashboardItem.Storage:
@@ -112,10 +84,7 @@ extension DashboardItemExtension on DashboardItem {
         return ListCustomerPage.path;
       case DashboardItem.Supplier:
         return MainPage.path;
-      case DashboardItem.Report:
-        return MainPage.path;
-      case DashboardItem.TimekeepingCreate:
-        return MainPage.path;
+
       default:
         return null;
     }
@@ -127,30 +96,21 @@ List<DashboardItem> getDashboardItems() {
   switch (userType) {
     case 2:
       return [
-        DashboardItem.Table,
-        DashboardItem.OrderList,
-        DashboardItem.OrderSale,
         DashboardItem.Ingredient,
         DashboardItem.Storage,
         DashboardItem.CashBook,
         DashboardItem.Employee,
         DashboardItem.Customer,
         DashboardItem.Supplier,
-        DashboardItem.Report,
       ];
     case 3:
       return [
-        DashboardItem.Table,
-        DashboardItem.OrderList,
-        DashboardItem.OrderSale,
         DashboardItem.Ingredient,
         DashboardItem.Storage,
         DashboardItem.CashBook,
         DashboardItem.Employee,
         DashboardItem.Customer,
         DashboardItem.Supplier,
-        DashboardItem.Report,
-        DashboardItem.TimekeepingCreate,
       ];
     default:
       return [];

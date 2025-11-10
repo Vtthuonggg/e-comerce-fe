@@ -9,7 +9,7 @@ import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/setting_page.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconly/iconly.dart';
-import 'package:iconsax/iconsax.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 enum ScreenTab { SCREEN_HOME, SCREEN_ORDERS, SCREEN_PRODUCTS, SCREEN_ACCOUNT }
@@ -143,9 +143,9 @@ class _MainPageState extends State<MainPage> {
               color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
           title: 'Đơn hàng',
-          icon: Icon(Iconsax.task, color: activeColor),
+          icon: Icon(IconsaxPlusLinear.task, color: activeColor),
           inactiveIcon: Icon(
-            Iconsax.task,
+            IconsaxPlusLinear.task,
             color: inactiveColor,
           ),
           activeColorPrimary: activeColor,
@@ -171,12 +171,12 @@ class _MainPageState extends State<MainPage> {
       PersistentBottomNavBarItem(
           title: 'Cài đặt',
           icon: Icon(
-            Iconsax.setting_2,
+            IconsaxPlusLinear.setting_2,
             color: activeColor,
             size: 25,
           ),
           inactiveIcon: Icon(
-            Iconsax.setting_2,
+            IconsaxPlusLinear.setting_2,
             color: inactiveColor,
             size: 22,
           ),
