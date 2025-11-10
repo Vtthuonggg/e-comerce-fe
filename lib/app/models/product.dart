@@ -6,15 +6,15 @@ class Product extends Model {
   int? retailCost;
   int? baseCost;
   num? stock;
-  int? categoryId;
+  List<int>? categoryIds;
   String? image;
-
+  String? unit;
   Product({
     this.name,
     this.retailCost,
     this.baseCost,
     this.stock,
-    required this.categoryId,
+    required this.categoryIds,
     this.image,
   });
 
@@ -24,8 +24,12 @@ class Product extends Model {
     retailCost = data['retail_cost'];
     baseCost = data['base_cost'];
     stock = data['stock'];
-    categoryId = data['category_id'];
+    categoryIds = (data['category_ids'] as List<dynamic>?)
+        ?.map((e) => int.tryParse(e.toString()) ?? (e is int ? e : 0))
+        .where((e) => e != 0)
+        .toList();
     image = data['image'];
+    unit = data['unit'];
   }
 
   @override
@@ -35,7 +39,8 @@ class Product extends Model {
         "retail_cost": retailCost,
         "base_cost": baseCost,
         "stock": stock,
-        "category_id": categoryId,
+        "category_ids": categoryIds,
         "image": image,
+        "unit": unit,
       };
 }

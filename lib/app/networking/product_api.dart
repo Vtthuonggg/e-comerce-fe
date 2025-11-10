@@ -19,16 +19,15 @@ class ProductApiService extends BaseApiService {
     LoggingInterceptor: LoggingInterceptor()
   };
 
-  Future<dynamic> listProduct(String? name, int page, int size, int type,
-      {int? storeId}) async {
+  Future<dynamic> listProduct(String? name, int page, int size,
+      {int? categoryId}) async {
     var queryParameters = {
       "name": name,
       "page": page,
-      "type": type,
       "per_page": size,
     };
-    if (storeId != null) {
-      queryParameters['store_id'] = storeId;
+    if (categoryId != null) {
+      queryParameters['category_id'] = categoryId;
     }
     return await network(
       request: (request) =>

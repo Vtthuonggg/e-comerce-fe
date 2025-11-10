@@ -9,6 +9,7 @@ import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -209,13 +210,9 @@ class _ListCategoryPageState extends NyState<ListCategoryPage> {
         Container(
           margin: EdgeInsets.symmetric(horizontal: 10.0),
           child: ListTile(
-            onTap: () {
-              // routeTo(ListProductByGroupPage.path, data: item, onPop: (value) {
-              //   _pagingController.refresh();
-              // });
-            },
+            onTap: () {},
             leading: Icon(
-              FontAwesomeIcons.shapes,
+              IconsaxPlusBroken.category_2,
               color: ThemeColor.get(context).primaryAccent,
             ),
             title: Text(

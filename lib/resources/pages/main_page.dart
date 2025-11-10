@@ -155,12 +155,12 @@ class _MainPageState extends State<MainPage> {
       PersistentBottomNavBarItem(
           title: 'Món ăn',
           icon: Icon(
-            FontAwesomeIcons.store,
+            IconsaxPlusLinear.cake,
             color: activeColor,
             size: 25,
           ),
           inactiveIcon: Icon(
-            FontAwesomeIcons.store,
+            IconsaxPlusLinear.cake,
             color: inactiveColor,
             size: 22,
           ),

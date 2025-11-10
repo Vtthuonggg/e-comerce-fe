@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/controllers/controller.dart';
+import 'package:flutter_app/app/models/product.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
@@ -25,6 +28,27 @@ class _EditProductPageState extends NyState<EditProductPage> {
 
   bool get isEdit => widget.data() != null;
 
+  @override
+  void initState() {
+    super.initState();
+    if (isEdit) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _patchDataForEdit(context));
+    }
+  }
+
+  _patchDataForEdit(BuildContext context) {
+    Product? data = widget.data()?['data'] as Product?;
+    if (data == null) return;
+    _formKey.currentState?.patchValue({
+      'name': data.name ?? '',
+      'retail_cost': vnd.format(data.retailCost ?? 0),
+      'base_cost': vnd.format(data.baseCost ?? 0),
+      'stock': roundQuantity(data.stock ?? 0),
+      'unit': data.unit ?? '',
+    });
+  }
+
   Future saveProduct() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
       setState(() {
@@ -47,9 +71,13 @@ class _EditProductPageState extends NyState<EditProductPage> {
       };
 
       try {
-        await api<ProductApiService>(
-            (request) => request.createProduct(payload));
-
+        if (isEdit) {
+          await api<ProductApiService>((request) =>
+              request.updateProduct(widget.data()['data'].id, payload));
+        } else {
+          await api<ProductApiService>(
+              (request) => request.createProduct(payload));
+        }
         CustomToast.showToastSuccess(context,
             description: isEdit
                 ? "Cập nhật món ăn thành công"
@@ -85,6 +113,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
                 FormBuilderTextField(
                   name: 'name',
                   keyboardType: TextInputType.streetAddress,
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(
                     labelText: 'Tên món ăn *',
                     hintText: 'Nhập tên món ăn',
@@ -105,13 +134,14 @@ class _EditProductPageState extends NyState<EditProductPage> {
                 // Giá bán
                 FormBuilderTextField(
                   name: 'retail_cost',
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(
                     labelText: 'Giá bán *',
-                    hintText: 'Nhập giá bán',
+                    hintText: '0',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    suffixText: 'VNĐ',
+                    suffixText: 'đ',
                   ),
                   inputFormatters: [
                     CurrencyTextInputFormatter(locale: 'vi', symbol: ''),
@@ -132,13 +162,14 @@ class _EditProductPageState extends NyState<EditProductPage> {
                 // Giá nhập
                 FormBuilderTextField(
                   name: 'base_cost',
+                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
                   decoration: InputDecoration(
                     labelText: 'Giá nhập *',
-                    hintText: 'Nhập giá mua vào',
+                    hintText: '0',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    suffixText: 'VNĐ',
+                    suffixText: 'đ',
                   ),
                   inputFormatters: [
                     CurrencyTextInputFormatter(locale: 'vi', symbol: ''),
@@ -157,53 +188,45 @@ class _EditProductPageState extends NyState<EditProductPage> {
                 SizedBox(height: 16),
 
                 // Tồn kho
-                FormBuilderTextField(
-                  name: 'stock',
-                  decoration: InputDecoration(
-                    labelText: 'Số lượng tồn kho',
-                    hintText: 'Nhập số lượng tồn kho',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                        name: 'stock',
+                        onTapOutside: (event) =>
+                            FocusScope.of(context).unfocus(),
+                        decoration: InputDecoration(
+                          labelText: 'Tồn kho',
+                          hintText: '0',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        keyboardType: TextInputType.number,
+                      ),
                     ),
-                  ),
-                  keyboardType: TextInputType.number,
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: FormBuilderTextField(
+                        name: 'unit',
+                        onTapOutside: (event) =>
+                            FocusScope.of(context).unfocus(),
+                        keyboardType: TextInputType.streetAddress,
+                        decoration: InputDecoration(
+                          labelText: 'Đơn vị tính',
+                          hintText: 'VD: cái, kg, lít...',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        validator: FormBuilderValidators.maxLength(50,
+                            errorText: 'Đơn vị tính không được quá 50 ký tự'),
+                      ),
+                    ),
+                  ],
                 ),
-
-                SizedBox(height: 16),
 
                 // Đơn vị
-                FormBuilderTextField(
-                  name: 'unit',
-                  decoration: InputDecoration(
-                    labelText: 'Đơn vị tính',
-                    hintText: 'VD: cái, kg, lít...',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  validator: FormBuilderValidators.maxLength(50,
-                      errorText: 'Đơn vị tính không được quá 50 ký tự'),
-                ),
-
-                SizedBox(height: 16),
-
-                // Loại món ăn
-                FormBuilderRadioGroup<int>(
-                  name: 'type',
-                  decoration: InputDecoration(
-                    labelText: 'Loại món ăn *',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  initialValue: 1,
-                  options: [
-                    FormBuilderFieldOption(value: 1, child: Text('Loại 1')),
-                    FormBuilderFieldOption(value: 2, child: Text('Loại 2')),
-                  ],
-                  validator: FormBuilderValidators.required(
-                      errorText: 'Vui lòng chọn loại món ăn'),
-                ),
 
                 SizedBox(height: 24),
 

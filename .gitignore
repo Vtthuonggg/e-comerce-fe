@@ -10,7 +10,7 @@
 .svn/
 env/
 .env
-
+pubspec.lock
 # IntelliJ related
 *.iml
 *.ipr

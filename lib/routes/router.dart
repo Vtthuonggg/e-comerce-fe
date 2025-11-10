@@ -14,6 +14,7 @@ import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
+import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
 import 'package:flutter_app/resources/pages/setting_page.dart';
 
@@ -134,6 +135,12 @@ appRouter() => nyRoutes((router) {
         ListEmployeePage.path,
         (context) => ListEmployeePage(),
         transition: PageTransitionType.rightToLeft,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ReportPage.path,
+        (context) => ReportPage(),
+        transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
     });

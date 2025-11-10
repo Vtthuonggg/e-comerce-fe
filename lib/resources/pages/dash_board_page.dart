@@ -85,6 +85,9 @@ class _DashboardPageState extends State<DashboardPage>
       body: Stack(
         children: [
           Container(
+            color: Color(0xffF9F9F9),
+          ),
+          Container(
             height: 105,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -96,42 +99,40 @@ class _DashboardPageState extends State<DashboardPage>
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(
-                children: [
-                  buildInfoCard(),
-                  Expanded(
-                    child: ListView(
-                      children: [
-                        buildOrderButtons(),
-                        GridView.count(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            crossAxisCount: shortestSide < 600 ? 3 : 5,
-                            mainAxisSpacing: 16,
-                            crossAxisSpacing: 16,
-                            childAspectRatio: 1,
-                            padding: EdgeInsets.all(14),
-                            children: [
-                              ...getDashboardItems().map((item) {
-                                return buildItem(
-                                  item.icon,
-                                  item.name,
-                                  onTab: () {
-                                    if (item.routePath != null) {
-                                      routeTo(item.routePath!);
-                                    }
-                                  },
-                                );
-                              }).toList(),
-                            ]),
-                        // _buildBottomBarView(context),
-                      ],
-                    ),
+            child: Column(
+              children: [
+                buildInfoCard(),
+                Expanded(
+                  child: ListView(
+                    children: [
+                      buildOrderButtons(),
+                      GridView.count(
+                          physics: NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          crossAxisCount: shortestSide < 600 ? 3 : 5,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 1,
+                          padding: EdgeInsets.all(14),
+                          children: [
+                            ...getDashboardItems().map((item) {
+                              return buildItem(
+                                item.icon,
+                                item.name,
+                                color: item.color,
+                                onTab: () {
+                                  if (item.routePath != null) {
+                                    routeTo(item.routePath!);
+                                  }
+                                },
+                              );
+                            }).toList(),
+                          ]),
+                      // _buildBottomBarView(context),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -143,7 +144,7 @@ class _DashboardPageState extends State<DashboardPage>
     return Container(
       width: 1.sw,
       padding: const EdgeInsets.all(20),
-      margin: EdgeInsets.symmetric(horizontal: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -315,6 +316,7 @@ class _DashboardPageState extends State<DashboardPage>
                 ),
               ),
             ),
+            SizedBox(width: 16),
             Expanded(
               flex: 19,
               child: Material(
@@ -376,12 +378,13 @@ class _DashboardPageState extends State<DashboardPage>
   }
 
   Widget buildItem(dynamic iconData, String title,
-      {Function()? onTab, bool isFlip = false}) {
+      {Function()? onTab, bool isFlip = false, Color? color}) {
+    final shortestSize = MediaQuery.of(context).size.shortestSide;
     return Container(
       padding: EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: BorderRadius.circular(shortestSize < 600 ? 10 : 20),
       ),
       child: InkWell(
         onTap: onTab,
@@ -391,20 +394,29 @@ class _DashboardPageState extends State<DashboardPage>
             children: [
               Transform.flip(
                 flipX: isFlip,
-                child: Icon(
-                  iconData,
-                  size: 40,
-                  color: ThemeColor.get(context).primaryAccent,
-                ),
+                child: iconData.runtimeType == String
+                    ? SvgPicture.asset(
+                        iconData,
+                        width: 30,
+                        height: 30,
+                        colorFilter: ColorFilter.mode(
+                            color ?? ThemeColor.get(context).primaryAccent,
+                            BlendMode.srcIn),
+                      )
+                    : Icon(
+                        iconData,
+                        size: 30,
+                        color: color ?? ThemeColor.get(context).primaryAccent,
+                      ),
               ),
               SizedBox(height: 4),
               Text(
                 title,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Color(0xFF5C5E5D),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  color: Color(0xFF262A37),
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18,
                 ),
               ),
             ],

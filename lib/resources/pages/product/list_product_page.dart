@@ -1,18 +1,25 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app/app/models/category.dart';
 import 'package:flutter_app/app/models/product.dart';
+import 'package:flutter_app/app/networking/category_api.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
+import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
+import 'package:flutter_app/resources/widgets/category_item.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/widgets/placeholder_food_image.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -27,17 +34,44 @@ class ListProductPage extends NyStatefulWidget {
 class _ListProductPageState extends NyState<ListProductPage> {
   final PagingController<int, Product> _pagingController =
       PagingController(firstPageKey: 1);
+  CategoryModel? selectedCate;
 
   String searchQuery = '';
   int _pageSize = 20;
   int _total = 0;
+  List<CategoryModel> lstCate = [];
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
+    _fetchCate();
     _pagingController.addPageRequestListener((pageKey) {
       _fetchProducts(pageKey);
     });
+  }
+
+  Future<void> _fetchCate() async {
+    try {
+      var res = await api<CategoryApiService>((request) => request.listCategory(
+            '',
+            1,
+            100,
+          ));
+      List<CategoryModel> newItems = [];
+      res["data"].forEach((item) {
+        newItems.add(CategoryModel.fromJson(item));
+      });
+      lstCate = [];
+      var highlightCate = CategoryModel();
+      highlightCate.name = 'Nổi bật';
+      highlightCate.id = null;
+      lstCate.add(highlightCate);
+      lstCate.addAll(newItems);
+      setState(() {});
+    } catch (error) {
+      showToastWarning(description: error.toString());
+    }
   }
 
   _fetchProducts(int pageKey) async {
@@ -47,7 +81,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
                 searchQuery,
                 pageKey,
                 _pageSize,
-                1,
+                categoryId: selectedCate?.id,
               ));
       setState(() {
         _total = newItems['meta']?['total'] ?? 0;
@@ -81,7 +115,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                _buildProductImage(product),
+                PlaceholderFoodImage(),
                 const SizedBox(width: 16),
                 Expanded(child: _buildProductInfo(product)),
                 _buildPopupMenu(product),
@@ -94,46 +128,6 @@ class _ListProductPageState extends NyState<ListProductPage> {
           child: Divider(height: 1, color: Colors.grey[300]),
         ),
       ],
-    );
-  }
-
-  Widget _buildProductImage(Product product) {
-    final dynamic img = (product as dynamic).image;
-    final bool hasImage = img != null && img.toString().isNotEmpty;
-
-    return Container(
-      width: 80,
-      height: 80,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: hasImage ? null : Colors.grey.shade100,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: hasImage
-            ? Image.network(
-                img.toString(),
-                width: 80,
-                height: 80,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) =>
-                    _buildPlaceholderImage(),
-              )
-            : _buildPlaceholderImage(),
-      ),
-    );
-  }
-
-  Widget _buildPlaceholderImage() {
-    return Container(
-      width: 80,
-      height: 80,
-      color: Colors.grey.shade100,
-      child: Icon(
-        Icons.fastfood_outlined,
-        color: Colors.grey.shade400,
-        size: 32,
-      ),
     );
   }
 
@@ -157,11 +151,11 @@ class _ListProductPageState extends NyState<ListProductPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (product.baseCost != null)
-          Text('Giá gốc: ${product.baseCost}',
+        if (product.baseCost != null && product.baseCost! > 0)
+          Text('Giá nhập: ${vnd.format(product.baseCost ?? 0)}',
               style: TextStyle(color: Colors.grey[700], fontSize: 13)),
         if (product.retailCost != null)
-          Text('Giá bán: ${product.retailCost}',
+          Text('Giá bán: ${vnd.format(product.retailCost ?? 0)}',
               style: TextStyle(
                   color: Colors.green[700],
                   fontSize: 13,
@@ -242,6 +236,22 @@ class _ListProductPageState extends NyState<ListProductPage> {
     );
   }
 
+  _debounceSearch() {
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      handleSearch();
+    });
+  }
+
+  handleSearch() {
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+    _pagingController.refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -251,23 +261,33 @@ class _ListProductPageState extends NyState<ListProductPage> {
         actions: [
           IconButton(
               onPressed: () {
-                routeTo(ListCategoryPage.path);
+                routeTo(ListCategoryPage.path, onPop: (value) {
+                  _fetchCate();
+                  setState(() {});
+                });
               },
-              icon: Icon(Icons.category))
+              icon: Icon(IconsaxPlusLinear.category_2))
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
+            CategoryHeader(
+              categories: lstCate,
+              selectedId: selectedCate?.id,
+              onTap: (cate) {
+                selectedCate = cate;
+                handleSearch();
+                setState(() {});
+              },
+            ),
             Padding(
               padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12),
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6),
               child: TextField(
                 onChanged: (value) {
                   setState(() => searchQuery = value);
-                  Future.delayed(const Duration(milliseconds: 500), () {
-                    if (mounted) _pagingController.refresh();
-                  });
+                  _debounceSearch();
                 },
                 decoration: InputDecoration(
                   hintText: 'Tìm kiếm món ăn',
@@ -285,7 +305,10 @@ class _ListProductPageState extends NyState<ListProductPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Tổng: $_total'),
+                  Text(
+                    'Tổng: $_total',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(width: 8),
                 ],
               ),
