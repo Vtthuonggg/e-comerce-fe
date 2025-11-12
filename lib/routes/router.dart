@@ -16,7 +16,7 @@ import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
-import 'package:flutter_app/resources/pages/setting_page.dart';
+import 'package:flutter_app/resources/pages/setting/setting_page.dart';
 
 import 'package:nylo_framework/nylo_framework.dart';
 
