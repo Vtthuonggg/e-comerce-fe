@@ -12,6 +12,6 @@ class EditEmployeePage extends StatefulWidget {
 class _EditEmployeePageState extends State<EditEmployeePage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold();
   }
 }

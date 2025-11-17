@@ -19,7 +19,9 @@ import 'package:nylo_framework/nylo_framework.dart';
 void main() async {
   Nylo.init();
   Nylo nylo = await Nylo.init(setup: Boot.nylo, setupFinished: Boot.finished);
-
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: createColor(LightThemeColors().primaryAccent),
+  ));
   initializeDateFormatting('vi_VN').then((_) => runApp(ScreenUtilInit(
         designSize: const Size(375, 812),
         child: AppBuild(

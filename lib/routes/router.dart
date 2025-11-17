@@ -1,6 +1,7 @@
 import 'package:flutter_app/login_page.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/register_page.dart';
+import 'package:flutter_app/resources/pages/Supplier/edit_Supplier_page.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/customer/edit_customer_page.dart';
@@ -17,6 +18,7 @@ import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
 import 'package:flutter_app/resources/pages/setting/setting_page.dart';
+import 'package:flutter_app/resources/pages/supplier/list_supplier_page.dart';
 
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -140,6 +142,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         ReportPage.path,
         (context) => ReportPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditSupplierPage.path,
+        (context) => EditSupplierPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ListSupplierPage.path,
+        (context) => ListSupplierPage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );

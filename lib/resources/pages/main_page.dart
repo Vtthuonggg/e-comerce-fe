@@ -7,8 +7,11 @@ import 'package:flutter_app/resources/pages/dash_board_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
 import 'package:flutter_app/resources/pages/setting/setting_page.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconly/iconly.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
+import 'package:nylo_framework/nylo_framework.dart';
 import 'package:persistent_bottom_nav_bar_v2/persistent-tab-view.dart';
 
 enum ScreenTab { SCREEN_HOME, SCREEN_ORDERS, SCREEN_PRODUCTS, SCREEN_ACCOUNT }
@@ -153,15 +156,17 @@ class _MainPageState extends State<MainPage> {
               color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold)),
       PersistentBottomNavBarItem(
           title: 'Món ăn',
-          icon: Icon(
-            IconsaxPlusLinear.cake,
-            color: activeColor,
-            size: 25,
+          icon: SvgPicture.asset(
+            getImageAsset('svg/food.svg'),
+            width: 25,
+            height: 25,
+            colorFilter: ColorFilter.mode(activeColor, BlendMode.srcIn),
           ),
-          inactiveIcon: Icon(
-            IconsaxPlusLinear.cake,
-            color: inactiveColor,
-            size: 22,
+          inactiveIcon: SvgPicture.asset(
+            getImageAsset('svg/food.svg'),
+            width: 22,
+            height: 22,
+            colorFilter: ColorFilter.mode(inactiveColor, BlendMode.srcIn),
           ),
           activeColorPrimary: activeColor,
           inactiveColorPrimary: inactiveColor,
@@ -170,12 +175,12 @@ class _MainPageState extends State<MainPage> {
       PersistentBottomNavBarItem(
           title: 'Cài đặt',
           icon: Icon(
-            IconsaxPlusLinear.setting_2,
+            IconsaxPlusLinear.setting,
             color: activeColor,
             size: 25,
           ),
           inactiveIcon: Icon(
-            IconsaxPlusLinear.setting_2,
+            IconsaxPlusLinear.setting,
             color: inactiveColor,
             size: 22,
           ),

@@ -181,7 +181,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
           value: 'edit',
           child: Row(
             children: [
-              Icon(Icons.edit, size: 18, color: Colors.blue),
+              Icon(IconsaxPlusLinear.edit_2, size: 18, color: Colors.blue),
               SizedBox(width: 8),
               Text('Sửa'),
             ],
@@ -191,7 +191,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete, size: 18, color: Colors.red),
+              Icon(IconsaxPlusLinear.trash, size: 18, color: Colors.red),
               SizedBox(width: 8),
               Text('Xóa'),
             ],

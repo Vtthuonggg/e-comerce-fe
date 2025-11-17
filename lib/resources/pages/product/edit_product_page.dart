@@ -1,13 +1,19 @@
 import 'dart:developer';
 
+import 'package:collection/collection.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/controllers/controller.dart';
+import 'package:flutter_app/app/models/Ingredient.dart';
+import 'package:flutter_app/app/models/category.dart';
 import 'package:flutter_app/app/models/product.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
+import 'package:flutter_app/resources/pages/category/category_select_multi.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/pages/ingredient/select_multi_ingredient.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -27,7 +33,13 @@ class _EditProductPageState extends NyState<EditProductPage> {
   bool _isLoading = false;
 
   bool get isEdit => widget.data() != null;
+  final _selectCateMultiKey = GlobalKey<DropdownSearchState<CategoryModel>>();
+  final GlobalKey<CategorytMultiSelectState> _categoryMultiKey =
+      GlobalKey<CategorytMultiSelectState>();
 
+  List<CategoryModel> selectedCates = [];
+  final _selectIngMultiKey = GlobalKey<DropdownSearchState<Ingredient>>();
+  List<Ingredient> selectedIng = [];
   @override
   void initState() {
     super.initState();
@@ -39,6 +51,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
 
   _patchDataForEdit(BuildContext context) {
     Product? data = widget.data()?['data'] as Product?;
+    selectedCates = data?.categories ?? [];
     if (data == null) return;
     _formKey.currentState?.patchValue({
       'name': data.name ?? '',
@@ -47,20 +60,30 @@ class _EditProductPageState extends NyState<EditProductPage> {
       'stock': roundQuantity(data.stock ?? 0),
       'unit': data.unit ?? '',
     });
+    selectedIng = data.ingredients ?? [];
+    setState(() {});
   }
 
   Future saveProduct() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
+      if (selectedIng
+          .where((element) => element.quantity == null || element.quantity == 0)
+          .isNotEmpty) {
+        CustomToast.showToastError(context,
+            description:
+                "Vui lòng nhập số lượng cho tất cả nguyên liệu đã chọn");
+        return;
+      }
+
       setState(() {
         _isLoading = true;
       });
 
       final formData = _formKey.currentState!.value;
-
       var payload = {
         'name': formData['name'],
-        'retail_cost': stringToInt(formData['retail_cost']),
-        'base_cost': stringToInt(formData['base_cost']),
+        'retail_cost': stringToInt(formData['retail_cost'] ?? '0'),
+        'base_cost': stringToInt(formData['base_cost'] ?? '0'),
         'stock': formData['stock'] != ''
             ? stringToDouble(formData['stock'].toString())
             : 0,
@@ -68,6 +91,13 @@ class _EditProductPageState extends NyState<EditProductPage> {
         'unit': formData['unit']?.toString().trim().isEmpty == true
             ? null
             : formData['unit'],
+        'category_ids': selectedCates.map((e) => e.id).toList(),
+        'ingredients': selectedIng
+            .map((e) => {
+                  'id': e.id,
+                  'quantity': e.quantity ?? 0,
+                })
+            .toList(),
       };
 
       try {
@@ -90,6 +120,47 @@ class _EditProductPageState extends NyState<EditProductPage> {
         setState(() {
           _isLoading = false;
         });
+      }
+    }
+  }
+
+  void addMultiCategory(List<CategoryModel> listCateSelected) {
+    if (listCateSelected.isEmpty) {
+      setState(() {
+        selectedCates = [];
+      });
+      return;
+    }
+    for (var cate in listCateSelected) {
+      if (selectedCates.indexWhere((element) => element.id == cate.id) == -1) {
+        setState(() {
+          selectedCates.add(cate);
+        });
+      } else {
+        selectedCates.removeWhere((i) =>
+            listCateSelected
+                .firstWhereOrNull((element) => element.id == i.id) ==
+            null);
+      }
+    }
+  }
+
+  addMultiIngredient(List<Ingredient> listIngSelected) {
+    if (listIngSelected.isEmpty) {
+      setState(() {
+        selectedIng = [];
+      });
+      return;
+    }
+    for (var ing in listIngSelected) {
+      if (selectedIng.indexWhere((element) => element.id == ing.id) == -1) {
+        setState(() {
+          selectedIng.add(ing);
+        });
+      } else {
+        selectedIng.removeWhere((i) =>
+            listIngSelected.firstWhereOrNull((element) => element.id == i.id) ==
+            null);
       }
     }
   }
@@ -175,14 +246,6 @@ class _EditProductPageState extends NyState<EditProductPage> {
                     CurrencyTextInputFormatter(locale: 'vi', symbol: ''),
                   ],
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(
-                        errorText: 'Vui lòng nhập giá gốc'),
-                    FormBuilderValidators.numeric(
-                        errorText: 'Giá gốc phải là số'),
-                    FormBuilderValidators.min(0,
-                        errorText: 'Giá gốc phải lớn hơn hoặc bằng 0'),
-                  ]),
                 ),
 
                 SizedBox(height: 16),
@@ -225,9 +288,23 @@ class _EditProductPageState extends NyState<EditProductPage> {
                     ),
                   ],
                 ),
-
-                // Đơn vị
-
+                SizedBox(height: 16),
+                CategorytMultiSelect(
+                  multiKey: _selectCateMultiKey,
+                  key: _categoryMultiKey,
+                  onSelect: (List<CategoryModel>? listCategory) {
+                    addMultiCategory(listCategory ?? []);
+                  },
+                  selectedItems: selectedCates,
+                ),
+                SizedBox(height: 16),
+                IngredientMultiSelect(
+                  multiKey: _selectIngMultiKey,
+                  onSelect: (List<Ingredient>? listIngredient) {
+                    addMultiIngredient(listIngredient ?? []);
+                  },
+                  selectedItems: selectedIng,
+                ),
                 SizedBox(height: 24),
 
                 // Nút Lưu

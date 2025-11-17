@@ -1,27 +1,27 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_app/app/models/customer.dart';
-import 'package:flutter_app/app/networking/customer_api.dart';
+import 'package:flutter_app/app/models/Supplier.dart';
+import 'package:flutter_app/app/networking/supplier_api.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
-import 'package:flutter_app/resources/pages/customer/edit_customer_page.dart';
+import 'package:flutter_app/resources/pages/Supplier/edit_Supplier_page.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-class ListCustomerPage extends NyStatefulWidget {
-  static const path = '/customers';
-  ListCustomerPage({super.key});
+class ListSupplierPage extends NyStatefulWidget {
+  static const path = '/suppliers';
+  ListSupplierPage({super.key});
 
   @override
-  NyState<ListCustomerPage> createState() => _ListCustomerPageState();
+  NyState<ListSupplierPage> createState() => _ListSupplierPageState();
 }
 
-class _ListCustomerPageState extends NyState<ListCustomerPage> {
-  final PagingController<int, Customer> _pagingController =
+class _ListSupplierPageState extends NyState<ListSupplierPage> {
+  final PagingController<int, Supplier> _pagingController =
       PagingController(firstPageKey: 1);
 
   String searchQuery = '';
@@ -38,13 +38,13 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
 
   Future<void> _fetchData(int pageKey) async {
     try {
-      Map<String, dynamic> res = await api<CustomerApiService>(
-          (request) => request.listCustomer(searchQuery, pageKey, _pageSize));
+      Map<String, dynamic> res = await api<SupplierApiService>(
+          (request) => request.listSupplier(searchQuery, pageKey, _pageSize));
 
       setState(() {
-        List<Customer> items = [];
+        List<Supplier> items = [];
         final data = res['data'] as List<dynamic>? ?? [];
-        data.forEach((item) => items.add(Customer.fromJson(item)));
+        data.forEach((item) => items.add(Supplier.fromJson(item)));
 
         final isLastPage = items.length < _pageSize;
         if (isLastPage) {
@@ -61,12 +61,12 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
     }
   }
 
-  Widget buildItem(Customer item) {
+  Widget buildItem(Supplier item) {
     return Column(
       children: [
         InkWell(
           onTap: () =>
-              routeTo(EditCustomerPage.path, data: {'data': item}, onPop: (_) {
+              routeTo(EditSupplierPage.path, data: {'data': item}, onPop: (_) {
             _pagingController.refresh();
           }),
           child: Padding(
@@ -89,7 +89,7 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
     );
   }
 
-  Widget _buildAvatar(Customer item) {
+  Widget _buildAvatar(Supplier item) {
     final String initials = (item.name ?? '')
         .trim()
         .split(' ')
@@ -106,7 +106,7 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
     );
   }
 
-  Widget _buildItemInfo(Customer item) {
+  Widget _buildItemInfo(Supplier item) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -127,12 +127,12 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
     );
   }
 
-  Widget _buildPopupMenu(Customer item) {
+  Widget _buildPopupMenu(Supplier item) {
     return PopupMenuButton<String>(
       icon: Icon(Icons.more_vert, color: Colors.grey[600], size: 20),
       onSelected: (value) async {
         if (value == 'edit') {
-          routeTo(EditCustomerPage.path, data: {'data': item}, onPop: (_) {
+          routeTo(EditSupplierPage.path, data: {'data': item}, onPop: (_) {
             _pagingController.refresh();
           });
         } else if (value == 'delete') {
@@ -164,14 +164,14 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
     );
   }
 
-  void _showDeleteConfirmationDialog(Customer item) {
+  void _showDeleteConfirmationDialog(Supplier item) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Xác nhận xóa'),
           content:
-              const Text('Bạn có chắc chắn muốn xóa khách hàng này không?'),
+              const Text('Bạn có chắc chắn muốn xóa nhà cung cấp này không?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -181,10 +181,10 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 try {
-                  await api<CustomerApiService>(
-                      (request) => request.deleteCustomer(item.id!));
+                  await api<SupplierApiService>(
+                      (request) => request.deleteSupplier(item.id!));
                   CustomToast.showToastSuccess(context,
-                      description: 'Xóa khách hàng thành công');
+                      description: 'Xóa nhà cung cấp thành công');
                   _pagingController.refresh();
                 } catch (error) {
                   log(error.toString());
@@ -204,12 +204,12 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: GradientAppBar(
-        title: const Text('Danh sách khách hàng',
+        title: const Text('Danh sách nhà cung cấp',
             style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [
           IconButton(
             onPressed: () {
-              routeTo(EditCustomerPage.path, onPop: (_) {
+              routeTo(EditSupplierPage.path, onPop: (_) {
                 _pagingController.refresh();
               });
             },
@@ -229,7 +229,7 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
                 });
               },
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm khách hàng',
+                hintText: 'Tìm kiếm nhà cung cấp',
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -269,7 +269,7 @@ class _ListCustomerPageState extends NyState<ListCustomerPage> {
                           color: ThemeColor.get(context).primaryAccent)),
                   itemBuilder: (context, item, index) => buildItem(item),
                   noItemsFoundIndicatorBuilder: (_) => const Center(
-                      child: Text('Không tìm thấy khách hàng nào')),
+                      child: Text('Không tìm thấy nhà cung cấp nào')),
                 ),
               ),
             ),

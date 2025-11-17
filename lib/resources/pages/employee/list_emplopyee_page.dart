@@ -15,6 +15,13 @@ class ListEmployeePage extends NyStatefulWidget {
 class _ListEmployeePageState extends NyState<ListEmployeePage> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Danh sách nhân viên'),
+      ),
+      body: Center(
+        child: Text('Danh sách nhân viên sẽ hiển thị ở đây'),
+      ),
+    );
   }
 }

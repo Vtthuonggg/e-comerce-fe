@@ -4,12 +4,9 @@ class CategoryModel extends Model {
   int? id;
   String? name;
   String? description;
+  bool isSelected = false;
 
-  CategoryModel({
-    this.id,
-    this.name,
-    this.description,
-  });
+  CategoryModel();
 
   CategoryModel.fromJson(dynamic data) {
     id = data['id'];
@@ -22,6 +19,7 @@ class CategoryModel extends Model {
       'id': id,
       'name': name,
       'description': description,
+      'selected': isSelected,
     };
   }
 }

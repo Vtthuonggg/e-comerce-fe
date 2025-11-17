@@ -7,6 +7,7 @@ import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart
 import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
+import 'package:flutter_app/resources/pages/supplier/list_supplier_page.dart';
 import 'package:flutter_app/resources/themes/styles/color_styles.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:iconly/iconly.dart';
@@ -95,7 +96,6 @@ extension DashboardItemExtension on DashboardItem {
         return IconsaxPlusLinear.people;
       case DashboardItem.Supplier:
         return IconsaxPlusLinear.user_octagon;
-
       case DashboardItem.Plus:
         return IconlyLight.plus;
       case DashboardItem.Ingredient:
@@ -114,12 +114,11 @@ extension DashboardItemExtension on DashboardItem {
       case DashboardItem.CashBook:
         return MainPage.path;
       case DashboardItem.Employee:
-        return MainPage.path;
+        return ListEmployeePage.path;
       case DashboardItem.Customer:
         return ListCustomerPage.path;
       case DashboardItem.Supplier:
-        return MainPage.path;
-
+        return ListSupplierPage.path;
       default:
         return null;
     }

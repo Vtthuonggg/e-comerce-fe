@@ -8,6 +8,8 @@ class Ingredient extends Model {
   num? inStock;
   String? unit;
   String? image;
+  num? quantity;
+  bool isSelected = false;
   Ingredient({
     this.id,
     this.name,
@@ -18,12 +20,13 @@ class Ingredient extends Model {
   });
   Ingredient.fromJson(dynamic json) {
     id = json['id'];
-    name = json['name'];
-    baseCost = json['base_cost'];
-    retailCost = json['retail_cost'];
-    inStock = json['in_stock'];
-    unit = json['unit'];
-    image = json['image'];
+    name = json['name'] ?? '';
+    baseCost = json['base_cost'] ?? 0;
+    retailCost = json['retail_cost'] ?? 0;
+    inStock = json['in_stock'] ?? 0;
+    unit = json['unit'] ?? '';
+    image = json['image'] ?? '';
+    quantity = json['quantity'] ?? 0;
   }
   @override
   toJson() {
@@ -34,6 +37,8 @@ class Ingredient extends Model {
       'retail_cost': retailCost,
       'in_stock': inStock,
       'unit': unit,
+      'image': image,
+      'is_selected': isSelected,
     };
   }
 }

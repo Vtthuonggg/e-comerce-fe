@@ -8,6 +8,7 @@ import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
+import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -242,7 +243,7 @@ class _ListIngredientPageState extends NyState<ListIngredientPage> {
           value: 'edit',
           child: Row(
             children: [
-              Icon(Icons.edit, size: 18, color: Colors.blue),
+              Icon(IconsaxPlusLinear.edit_2, size: 18, color: Colors.blue),
               SizedBox(width: 8),
               Text('Sửa'),
             ],
@@ -252,7 +253,7 @@ class _ListIngredientPageState extends NyState<ListIngredientPage> {
           value: 'delete',
           child: Row(
             children: [
-              Icon(Icons.delete, size: 18, color: Colors.red),
+              Icon(IconsaxPlusLinear.trash, size: 18, color: Colors.red),
               SizedBox(width: 8),
               Text('Xóa'),
             ],

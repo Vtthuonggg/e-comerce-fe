@@ -252,7 +252,7 @@ class _ListCategoryPageState extends NyState<ListCategoryPage> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.edit_outlined,
+                        IconsaxPlusLinear.edit_2,
                         color: Colors.blue[600],
                         size: 20,
                       ),
@@ -273,7 +273,7 @@ class _ListCategoryPageState extends NyState<ListCategoryPage> {
                   child: Row(
                     children: [
                       Icon(
-                        Icons.delete_outline,
+                        IconsaxPlusLinear.trash,
                         color: Colors.red[600],
                         size: 20,
                       ),
