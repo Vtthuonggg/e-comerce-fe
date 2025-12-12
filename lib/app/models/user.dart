@@ -12,6 +12,7 @@ class User extends Model {
   String? image;
   int? type;
   String? apiKey;
+  bool isPosRoomUser = false;
 
   User();
 

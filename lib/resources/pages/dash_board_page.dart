@@ -6,6 +6,7 @@ import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/constant.dart';
 import 'package:flutter_app/resources/pages/report/report_page.dart';
+import 'package:flutter_app/resources/pages/table/manage_table_page.dart';
 import 'package:flutter_app/resources/themes/styles/color_styles.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -325,7 +326,7 @@ class _DashboardPageState extends State<DashboardPage>
                 child: InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: () {
-                    // routeTo(ManageTablePage.path);
+                    routeTo(ManageTablePage.path);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(horizontal: 40),

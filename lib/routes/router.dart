@@ -19,6 +19,7 @@ import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
 import 'package:flutter_app/resources/pages/setting/setting_page.dart';
 import 'package:flutter_app/resources/pages/supplier/list_supplier_page.dart';
+import 'package:flutter_app/resources/pages/table/manage_table_page.dart';
 
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -154,6 +155,12 @@ appRouter() => nyRoutes((router) {
       router.route(
         ListSupplierPage.path,
         (context) => ListSupplierPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ManageTablePage.path,
+        (context) => ManageTablePage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );

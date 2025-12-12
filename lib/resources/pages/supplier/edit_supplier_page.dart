@@ -72,80 +72,254 @@ class _EditSupplierPageState extends NyState<EditSupplierPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primary = ThemeColor.get(context).primaryAccent;
+
     return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
       appBar: GradientAppBar(
-        title: Text(isEdit ? 'Sửa nhà cung cấp' : 'Thêm nhà cung cấp',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          isEdit ? 'Sửa nhà cung cấp' : 'Thêm nhà cung cấp',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                FormBuilder(
-                  key: _formKey,
-                  onChanged: () => _formKey.currentState?.save(),
-                  child: Column(
-                    children: [
-                      FormBuilderTextField(
-                        name: 'name',
-                        decoration: const InputDecoration(labelText: 'Tên'),
-                        keyboardType: TextInputType.name,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(),
-                          FormBuilderValidators.maxLength(255),
-                        ]),
-                      ),
-                      const SizedBox(height: 16),
-                      FormBuilderTextField(
-                        name: 'phone',
-                        decoration:
-                            const InputDecoration(labelText: 'Số điện thoại'),
-                        keyboardType: TextInputType.phone,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.maxLength(20),
-                        ]),
-                      ),
-                      const SizedBox(height: 16),
-                      FormBuilderTextField(
-                        name: 'address',
-                        decoration: const InputDecoration(labelText: 'Địa chỉ'),
-                        keyboardType: TextInputType.streetAddress,
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.maxLength(255),
-                        ]),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 28),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: ThemeColor.get(context).primaryAccent,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                  ),
-                  onPressed: _saveSupplier,
-                  child: _loading
-                      ? const SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(isEdit ? 'Cập nhật' : 'Tạo',
-                          style: const TextStyle(color: Colors.white)),
-                ),
-                const SizedBox(height: 24),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                theme.colorScheme.surface,
+                theme.colorScheme.surfaceVariant.withOpacity(0.35),
               ],
+            ),
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 540),
+              child: SingleChildScrollView(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: primary.withOpacity(.12),
+                          radius: 26,
+                          child: Icon(
+                            Icons.store_outlined,
+                            color: primary,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isEdit
+                                    ? 'Cập nhật thông tin nhà cung cấp'
+                                    : 'Tạo mới nhà cung cấp',
+                                style: theme.textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Điền đầy đủ các thông tin dưới đây để đảm bảo dữ liệu chính xác.',
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: theme.hintColor),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: [
+                        Chip(
+                          avatar: Icon(
+                            isEdit ? Icons.edit : Icons.add,
+                            size: 18,
+                            color: primary,
+                          ),
+                          label:
+                              Text(isEdit ? 'Chế độ chỉnh sửa' : 'Chế độ tạo'),
+                          backgroundColor: primary.withOpacity(.08),
+                          labelStyle: theme.textTheme.bodyMedium
+                              ?.copyWith(color: primary),
+                        ),
+                        Chip(
+                          avatar: Icon(
+                            Icons.verified_user_outlined,
+                            size: 18,
+                            color: theme.colorScheme.secondary,
+                          ),
+                          label: const Text('Thông tin bảo mật'),
+                          backgroundColor: theme.colorScheme.secondaryContainer
+                              .withOpacity(.25),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Card(
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 28),
+                        child: FormBuilder(
+                          key: _formKey,
+                          onChanged: () => _formKey.currentState?.save(),
+                          child: Column(
+                            children: [
+                              FormBuilderTextField(
+                                name: 'name',
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  labelText: 'Tên nhà cung cấp',
+                                  hintText: 'Ví dụ: Công ty ABC',
+                                  filled: true,
+                                  fillColor: theme.colorScheme.surfaceVariant
+                                      .withOpacity(.3),
+                                  prefixIcon: const Icon(Icons.badge_outlined),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.name,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.required(),
+                                  FormBuilderValidators.maxLength(255),
+                                ]),
+                              ),
+                              const SizedBox(height: 18),
+                              FormBuilderTextField(
+                                name: 'phone',
+                                textInputAction: TextInputAction.next,
+                                decoration: InputDecoration(
+                                  labelText: 'Số điện thoại',
+                                  hintText: '0909 123 456',
+                                  filled: true,
+                                  fillColor: theme.colorScheme.surfaceVariant
+                                      .withOpacity(.3),
+                                  prefixIcon: const Icon(Icons.phone_outlined),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.phone,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.maxLength(20),
+                                ]),
+                              ),
+                              const SizedBox(height: 18),
+                              FormBuilderTextField(
+                                name: 'address',
+                                maxLines: 2,
+                                decoration: InputDecoration(
+                                  labelText: 'Địa chỉ',
+                                  hintText: 'Số nhà, đường, thành phố...',
+                                  filled: true,
+                                  fillColor: theme.colorScheme.surfaceVariant
+                                      .withOpacity(.3),
+                                  prefixIcon:
+                                      const Icon(Icons.location_on_outlined),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                                keyboardType: TextInputType.streetAddress,
+                                validator: FormBuilderValidators.compose([
+                                  FormBuilderValidators.maxLength(255),
+                                ]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 28),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _loading
+                                ? null
+                                : () => Navigator.of(context).pop(),
+                            style: ElevatedButton.styleFrom(
+                              elevation: 0,
+                              backgroundColor: theme.colorScheme.surfaceVariant
+                                  .withOpacity(.5),
+                              foregroundColor:
+                                  theme.colorScheme.onSurfaceVariant,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            child: const Text('Hủy'),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              elevation: 3,
+                              backgroundColor: primary,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 14, horizontal: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            onPressed: _loading ? null : _saveSupplier,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 250),
+                              child: _loading
+                                  ? const SizedBox(
+                                      key: ValueKey('loading'),
+                                      width: 22,
+                                      height: 22,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      isEdit
+                                          ? 'Lưu thay đổi'
+                                          : 'Tạo nhà cung cấp',
+                                      key: const ValueKey('label'),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Ứng dụng sẽ tự động đồng bộ thông tin với các module bán hàng.',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodySmall
+                          ?.copyWith(color: theme.hintColor),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

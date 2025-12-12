@@ -5,6 +5,7 @@ import 'package:flutter_app/app/networking/dio/base_api_service.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/app/networking/ingredient_api.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
+import 'package:flutter_app/app/networking/room_api_service.dart';
 import 'package:flutter_app/app/networking/supplier_api.dart';
 import '/app/models/user.dart';
 import '/app/networking/api_service.dart';
@@ -43,6 +44,7 @@ final Map<Type, BaseApiService> apiDecoders = {
   IngredientApiService: IngredientApiService(),
   CustomerApiService: CustomerApiService(),
   SupplierApiService: SupplierApiService(),
+  RoomApiService: RoomApiService(),
 
   // ...
 };

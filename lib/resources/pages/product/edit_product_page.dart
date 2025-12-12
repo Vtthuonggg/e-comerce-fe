@@ -230,26 +230,6 @@ class _EditProductPageState extends NyState<EditProductPage> {
 
                 SizedBox(height: 16),
 
-                // Giá nhập
-                FormBuilderTextField(
-                  name: 'base_cost',
-                  onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                  decoration: InputDecoration(
-                    labelText: 'Giá nhập *',
-                    hintText: '0',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    suffixText: 'đ',
-                  ),
-                  inputFormatters: [
-                    CurrencyTextInputFormatter(locale: 'vi', symbol: ''),
-                  ],
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                ),
-
-                SizedBox(height: 16),
-
                 // Tồn kho
                 Row(
                   children: [

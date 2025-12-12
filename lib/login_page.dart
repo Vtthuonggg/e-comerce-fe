@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -75,11 +76,9 @@ class _LoginPageState extends NyState<LoginPage> {
       CustomToast.showToastSuccess(context,
           description: "Đăng nhập thành công");
     } catch (e) {
-      log(e.toString());
       setState(() {
-        _errorMessage = 'Tài khoản hoặc mật khẩu không đúng';
+        _errorMessage = getResponseError(e);
       });
-      log(e.toString());
     } finally {
       setState(() {
         _loading = false;

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:nylo_framework/nylo_framework.dart';
@@ -13,6 +14,7 @@ String getResponseError(dynamic e) {
     dynamic message = e.response?.data['message'] ?? e.response.data['error'];
 
     if (message is String) {
+      log(message);
       if (message.length > 50) {
         message = message.substring(0, 50) + "...";
       }
