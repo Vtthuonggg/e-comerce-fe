@@ -310,13 +310,6 @@ class _EditSupplierPageState extends NyState<EditSupplierPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Ứng dụng sẽ tự động đồng bộ thông tin với các module bán hàng.',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodySmall
-                          ?.copyWith(color: theme.hintColor),
-                    ),
                   ],
                 ),
               ),

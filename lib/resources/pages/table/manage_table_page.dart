@@ -85,14 +85,13 @@ class _ManageTablePageState extends NyState<ManageTablePage> {
   List<dynamic> _filterAreas(List<Area> data, {String? type}) {
     List<Area> filteredAreas = data;
 
-    // Lọc các phòng theo type nếu type không phải là null
     if (type != null) {
       List<String> typesToFilter = type == TableStatus.using.toValue()
           ? [TableStatus.using.toValue(), TableStatus.preOrder.toValue()]
           : [type];
       filteredAreas = filteredAreas.map((area) {
         var filteredRooms = area.rooms
-            .where((room) => typesToFilter.contains(room['type']))
+            .where((room) => typesToFilter.contains(room['status']))
             .toList();
         return Area(
           id: area.id,

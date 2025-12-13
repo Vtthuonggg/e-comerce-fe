@@ -201,7 +201,7 @@ class _ListIngredientPageState extends NyState<ListIngredientPage> {
             ),
           ),
         ),
-        if (item.unit != null)
+        if (item.unit != null && item.unit != '')
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
