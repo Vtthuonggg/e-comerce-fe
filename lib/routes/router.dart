@@ -12,6 +12,7 @@ import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
+import 'package:flutter_app/resources/pages/order/add_storage_order_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
@@ -161,6 +162,12 @@ appRouter() => nyRoutes((router) {
       router.route(
         ManageTablePage.path,
         (context) => ManageTablePage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        AddStorageOrderPage.path,
+        (context) => AddStorageOrderPage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );

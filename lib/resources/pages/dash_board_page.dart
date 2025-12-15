@@ -5,6 +5,7 @@ import 'package:flutter_app/app/utils/dashboard.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/constant.dart';
+import 'package:flutter_app/resources/pages/order/add_storage_order_page.dart';
 import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/table/manage_table_page.dart';
 import 'package:flutter_app/resources/themes/styles/color_styles.dart';
@@ -279,7 +280,7 @@ class _DashboardPageState extends State<DashboardPage>
                 child: InkWell(
                   borderRadius: BorderRadius.circular(10),
                   onTap: () {
-                    // routeTo(AddStoragePage.path);
+                    routeTo(AddStorageOrderPage.path);
                   },
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
