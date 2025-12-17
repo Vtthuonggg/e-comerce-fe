@@ -8,7 +8,7 @@ import 'package:flutter_app/bootstrap/boot.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/common_define.dart';
 import 'package:flutter_app/config/storage_keys.dart';
-import 'package:flutter_app/login_page.dart';
+import 'package:flutter_app/resources/pages/login_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/themes/styles/light_theme_colors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

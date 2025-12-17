@@ -1,6 +1,6 @@
 import 'package:flutter_app/config/common_define.dart';
 import 'package:flutter_app/config/storage_keys.dart';
-import 'package:flutter_app/login_page.dart';
+import 'package:flutter_app/resources/pages/login_page.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 class LogoutEvent implements NyEvent {

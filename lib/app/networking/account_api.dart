@@ -74,4 +74,48 @@ class AccountApi extends BaseApiService {
           return response.data;
         });
   }
+
+  Future<dynamic> sendOtp(String email) async {
+    return await network(
+        request: (request) => request.post("/otp/send", data: {"email": email}),
+        handleFailure: (error) => throw error,
+        handleSuccess: (response) async {
+          return response.data;
+        });
+  }
+
+  Future<dynamic> resendOtp(String email) async {
+    return await network(
+        request: (request) =>
+            request.post("/otp/resend", data: {"email": email}),
+        handleFailure: (error) => throw error,
+        handleSuccess: (response) async {
+          return response.data;
+        });
+  }
+
+  Future<dynamic> verifyOtp(String email, String otp) async {
+    return await network(
+        request: (request) => request.post("/otp/verify", data: {
+              "email": email,
+              "otp": otp,
+            }),
+        handleFailure: (error) => throw error,
+        handleSuccess: (response) async {
+          return response.data;
+        });
+  }
+
+  Future<dynamic> registerWithOtp(dynamic data) async {
+    return await network(
+        request: (request) => request.post("/otp/register", data: data),
+        handleFailure: (error) => throw error,
+        handleSuccess: (response) async {
+          User user = User.fromJson(response.data["data"]["user"]);
+          await NyStorage.store(
+              StorageKey.userToken, response.data["data"]["access_token"],
+              inBackpack: true);
+          return user;
+        });
+  }
 }

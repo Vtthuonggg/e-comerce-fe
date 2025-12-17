@@ -10,11 +10,11 @@ import 'package:flutter_app/app/events/login_event.dart';
 import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
 import 'package:flutter_app/bootstrap/extensions.dart';
-import 'package:flutter_app/register_page.dart';
+import 'package:flutter_app/resources/pages/register_page.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../../bootstrap/helpers.dart';
+import '../../../../../bootstrap/helpers.dart';
 
 class LoginPage extends NyStatefulWidget {
   final Controller controller = Controller();
@@ -31,11 +31,11 @@ class _LoginPageState extends NyState<LoginPage> {
   bool _loading = false;
   bool _isPasswordVisible = false;
   String _errorMessage = '';
-  TextEditingController _phoneController = TextEditingController();
+  TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   int userType = 2;
   _login() async {
-    if (_phoneController.text == '' || _passwordController.text == '') {
+    if (_emailController.text == '' || _passwordController.text == '') {
       setState(() {
         _errorMessage = 'Vui lòng nhập đầy đủ thông tin';
       });
@@ -64,7 +64,7 @@ class _LoginPageState extends NyState<LoginPage> {
       _loading = true;
     });
     final payload = {
-      'phone': _phoneController.text,
+      'email': _emailController.text,
       'password': _passwordController.text,
     };
 
@@ -117,14 +117,14 @@ class _LoginPageState extends NyState<LoginPage> {
               ),
               12.verticalSpace,
               TextField(
-                controller: _phoneController,
+                controller: _emailController,
                 cursorColor: context.color.primaryAccent,
                 onTapOutside: (event) {
                   FocusScope.of(context).unfocus();
                 },
                 decoration: InputDecoration(
-                    labelText: 'Số điện thoại',
-                    hintText: 'VD: 0987654321',
+                    labelText: 'Email',
+                    hintText: 'VD: user@example.com',
                     floatingLabelStyle: TextStyle(
                       color: context.color.primaryAccent,
                     ),

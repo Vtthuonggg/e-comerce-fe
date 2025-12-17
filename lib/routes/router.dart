@@ -1,6 +1,8 @@
-import 'package:flutter_app/login_page.dart';
+import 'package:flutter_app/resources/pages/login_page.dart';
 import 'package:flutter_app/main.dart';
-import 'package:flutter_app/register_page.dart';
+import 'package:flutter_app/resources/pages/register_info_page.dart';
+import 'package:flutter_app/resources/pages/register_otp_page.dart';
+import 'package:flutter_app/resources/pages/register_page.dart';
 import 'package:flutter_app/resources/pages/Supplier/edit_Supplier_page.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
@@ -168,6 +170,18 @@ appRouter() => nyRoutes((router) {
       router.route(
         AddStorageOrderPage.path,
         (context) => AddStorageOrderPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        RegisterOtpPage.path,
+        (context) => RegisterOtpPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        RegisterInfoPage.path,
+        (context) => RegisterInfoPage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
