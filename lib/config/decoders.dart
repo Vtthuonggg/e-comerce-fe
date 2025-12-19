@@ -3,6 +3,7 @@ import 'package:flutter_app/app/networking/cloudinary_api.dart';
 import 'package:flutter_app/app/networking/customer_api.dart';
 import 'package:flutter_app/app/networking/dio/base_api_service.dart';
 import 'package:flutter_app/app/networking/account_api.dart';
+import 'package:flutter_app/app/networking/employee_api.dart';
 import 'package:flutter_app/app/networking/ingredient_api.dart';
 import 'package:flutter_app/app/networking/order_api_service.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
@@ -47,6 +48,7 @@ final Map<Type, BaseApiService> apiDecoders = {
   SupplierApiService: SupplierApiService(),
   RoomApiService: RoomApiService(),
   OrderApiService: OrderApiService(),
+  EmployeeApiService: EmployeeApiService(),
   // ...
 };
 

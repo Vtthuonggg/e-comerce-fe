@@ -64,8 +64,9 @@ class _LoginPageState extends NyState<LoginPage> {
       _loading = true;
     });
     final payload = {
-      'email': _emailController.text,
+      'username': _emailController.text,
       'password': _passwordController.text,
+      'is_employee': userType == 1 ? true : false,
     };
 
     try {

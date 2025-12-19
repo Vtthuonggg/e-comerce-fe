@@ -144,7 +144,6 @@ List<DashboardItem> getDashboardItems() {
         DashboardItem.Ingredient,
         DashboardItem.Storage,
         DashboardItem.CashBook,
-        DashboardItem.Employee,
         DashboardItem.Customer,
         DashboardItem.Supplier,
       ];

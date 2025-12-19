@@ -19,12 +19,13 @@ class IngredientMultiSelect extends NyStatefulWidget {
   final void Function(List<Ingredient>? variant) onSelect;
   final List<Ingredient> selectedItems;
   final String confirmText;
-
+  bool? isShowList = true;
   IngredientMultiSelect({
     Key? key,
     required this.multiKey,
     required this.onSelect,
     required this.selectedItems,
+    this.isShowList,
     this.confirmText = 'Tiếp tục',
   });
 
@@ -271,7 +272,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
             ),
           ),
         ),
-        if (widget.selectedItems.isNotEmpty) ...[
+        if (widget.selectedItems.isNotEmpty && widget.isShowList == true) ...[
           SizedBox(height: 16),
           Text(
             'Nguyên liệu đã chọn:',
@@ -410,73 +411,65 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
         ),
       ),
       child: ListTile(
-        onTap: () {
-          setState(() {
-            if (isSelected) {
-              listItemsSelectedTmp
-                  .removeWhere((element) => element.id == item.id);
-            } else {
-              listItemsSelectedTmp.add(item);
-            }
-          });
-        },
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: item.image != null && item.image!.isNotEmpty
-              ? Image.network(
-                  item.image!,
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
+          onTap: () {
+            setState(() {
+              if (isSelected) {
+                listItemsSelectedTmp
+                    .removeWhere((element) => element.id == item.id);
+              } else {
+                listItemsSelectedTmp.add(item);
+              }
+            });
+          },
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: item.image != null && item.image!.isNotEmpty
+                ? Image.network(
+                    item.image!,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      width: 50,
+                      height: 50,
+                      color: Colors.grey[200],
+                      child:
+                          Image.asset('public/assets/images/placeholder.png'),
+                    ),
+                  )
+                : Container(
                     width: 50,
                     height: 50,
                     color: Colors.grey[200],
                     child: Image.asset('public/assets/images/placeholder.png'),
                   ),
-                )
-              : Container(
-                  width: 50,
-                  height: 50,
-                  color: Colors.grey[200],
-                  child: Image.asset('public/assets/images/placeholder.png'),
-                ),
-        ),
-        title: Text(
-          item.name!.length > 25
-              ? item.name!.substring(0, 25) + '...'
-              : item.name!,
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            color: isSelected
-                ? ThemeColor.get(context).primaryAccent
-                : Colors.grey[800],
           ),
-        ),
-        subtitle: item.unit != null
-            ? Text(
-                'Đơn vị: ${item.unit}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
-              )
-            : null,
-        trailing: Container(
-          padding: EdgeInsets.all(4),
-          decoration: BoxDecoration(
-            color: isSelected
-                ? ThemeColor.get(context).primaryAccent
-                : Colors.transparent,
-            borderRadius: BorderRadius.circular(4),
+          title: Text(
+            item.name!.length > 25
+                ? item.name!.substring(0, 25) + '...'
+                : item.name!,
+            style: TextStyle(
+              fontWeight: FontWeight.w500,
+              color: isSelected
+                  ? ThemeColor.get(context).primaryAccent
+                  : Colors.grey[800],
+            ),
           ),
-          child: Icon(
-            isSelected ? Icons.check : Icons.add,
-            color: isSelected ? Colors.white : Colors.grey[500],
-            size: 18,
-          ),
-        ),
-      ),
+          subtitle: Text('Tồn kho: ${item.inStock}',
+              style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+          trailing: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                vnd.format(item.baseCost ?? 0),
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+              if (item.unit != null && item.unit!.isNotEmpty) ...[
+                Text('ĐV: ${item.unit}',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]))
+              ]
+            ],
+          )),
     );
   }
 

@@ -185,4 +185,16 @@ appRouter() => nyRoutes((router) {
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
+      router.route(
+        ListEmployeePage.path,
+        (context) => ListEmployeePage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        EditEmployeePage.path,
+        (context) => EditEmployeePage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
     });

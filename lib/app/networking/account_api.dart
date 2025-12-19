@@ -20,6 +20,7 @@ class AccountApi extends BaseApiService {
   String get baseUrl => getEnv('API_BASE_URL');
 
   Future<User?> login(dynamic data) async {
+    log('Login data: $data');
     return await network(
         request: (request) => request.post("/login", data: data),
         handleFailure: (error) => throw error,

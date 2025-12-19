@@ -13,7 +13,7 @@ import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/category/category_select_multi.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
-import 'package:flutter_app/resources/pages/ingredient/select_multi_ingredient.dart';
+import 'package:flutter_app/resources/widgets/select_multi_ingredient.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
