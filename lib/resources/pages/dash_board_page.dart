@@ -36,7 +36,7 @@ class _DashboardPageState extends State<DashboardPage>
     return Scaffold(
       appBar: GradientAppBar(
         title: Text(
-          'Bate - Quản lý nhà hàng',
+          'E-Restaurant - Quản lý nhà hàng',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),

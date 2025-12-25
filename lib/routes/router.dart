@@ -1,5 +1,6 @@
 import 'package:flutter_app/resources/pages/login_page.dart';
 import 'package:flutter_app/main.dart';
+import 'package:flutter_app/resources/pages/order/select_multi_product_page.dart';
 import 'package:flutter_app/resources/pages/register_info_page.dart';
 import 'package:flutter_app/resources/pages/register_otp_page.dart';
 import 'package:flutter_app/resources/pages/register_page.dart';
@@ -194,6 +195,12 @@ appRouter() => nyRoutes((router) {
       router.route(
         EditEmployeePage.path,
         (context) => EditEmployeePage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        SelectMultiProductPage.path,
+        (context) => SelectMultiProductPage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );

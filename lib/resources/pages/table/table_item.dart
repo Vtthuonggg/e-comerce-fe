@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:flutter_app/resources/pages/order/select_multi_product_page.dart';
+import 'package:nylo_framework/nylo_framework.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -569,19 +571,19 @@ class _TableItemState extends State<TableItem> {
         GestureDetector(
           onTap: () {
             if (widget.status == TableStatus.free) {
-              // routeTo(
-              //   SelectVariantTablePage.path,
-              //   data: {
-              //     "room_id": widget.id,
-              //     "room_type": TableStatus.free.toValue(),
-              //     "button_type": "create_order",
-              //     "room_name": widget.name,
-              //     "area_name": widget.areaName,
-              //   },
-              //   onPop: (value) {
-              //     widget.refresh();
-              //   },
-              // );
+              routeTo(
+                SelectMultiProductPage.path,
+                data: {
+                  "room_id": widget.id,
+                  "room_type": TableStatus.free.toValue(),
+                  "button_type": "create_order",
+                  "room_name": widget.name,
+                  "area_name": widget.areaName,
+                },
+                onPop: (value) {
+                  widget.refresh();
+                },
+              );
             } else {
               if (widget.status == TableStatus.using) {
                 // goToUpdateOrder(TableStatus.free, true);

@@ -64,7 +64,7 @@ class _EditEmployeePageState extends NyState<EditEmployeePage> {
           if (_showPasswordField && formData['password'] != null)
             'password': formData['password'],
         };
-
+        log(payload.toString());
         await api<EmployeeApiService>((request) => isEdit
             ? request.updateEmployee(employee!.id!, payload)
             : request.createEmployee(payload));
