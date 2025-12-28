@@ -1,16 +1,12 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/models/user.dart';
+import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/customer/list_customer_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
-import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/supplier/list_supplier_page.dart';
 import 'package:flutter_app/resources/themes/styles/color_styles.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:iconly/iconly.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
@@ -22,7 +18,7 @@ enum DashboardItem {
   Customer,
   Supplier,
   Ingredient,
-  Plus,
+  Category,
 }
 
 extension DashboardItemExtension on DashboardItem {
@@ -42,8 +38,9 @@ extension DashboardItemExtension on DashboardItem {
         return 'Nhà cung cấp';
       case DashboardItem.Report:
         return 'Báo cáo';
-      case DashboardItem.Plus:
-        return 'Mở rộng';
+      case DashboardItem.Category:
+        return 'Danh mục';
+
       default:
         return '';
     }
@@ -65,17 +62,8 @@ extension DashboardItemExtension on DashboardItem {
         return HexColor.fromHex('#D5B3FE');
       case DashboardItem.Supplier:
         return HexColor.fromHex('#11CDFB');
-
-      // case DashboardItem.Salary:
-      //   return Colors.cyan;
-      // case DashboardItem.TimekeepingReport:
-      //   return Colors.lime;
-      // case DashboardItem.TimekeepingCreate:
-      //   return Colors.amber;
-      // case DashboardItem.Works:
-      //   return Colors.pink;
-      case DashboardItem.Plus:
-        return HexColor.fromHex('#1ADCF5');
+      case DashboardItem.Category:
+        return HexColor.fromHex('#9C27B0');
 
       default:
         return Colors.blueGrey;
@@ -96,10 +84,10 @@ extension DashboardItemExtension on DashboardItem {
         return IconsaxPlusLinear.people;
       case DashboardItem.Supplier:
         return IconsaxPlusLinear.user_octagon;
-      case DashboardItem.Plus:
-        return IconlyLight.plus;
       case DashboardItem.Ingredient:
         return Icons.inventory_2_outlined;
+      case DashboardItem.Category:
+        return IconsaxPlusLinear.category;
       default:
         return IconsaxPlusLinear.home_2;
     }
@@ -119,6 +107,10 @@ extension DashboardItemExtension on DashboardItem {
         return ListCustomerPage.path;
       case DashboardItem.Supplier:
         return ListSupplierPage.path;
+      case DashboardItem.Report:
+        return MainPage.path;
+      case DashboardItem.Category:
+        return ListCategoryPage.path;
       default:
         return null;
     }
@@ -136,8 +128,8 @@ List<DashboardItem> getDashboardItems() {
         DashboardItem.Employee,
         DashboardItem.Customer,
         DashboardItem.Supplier,
+        DashboardItem.Category,
         DashboardItem.Report,
-        DashboardItem.Plus,
       ];
     case 3:
       return [
@@ -146,6 +138,8 @@ List<DashboardItem> getDashboardItems() {
         DashboardItem.CashBook,
         DashboardItem.Customer,
         DashboardItem.Supplier,
+        DashboardItem.Category,
+        DashboardItem.Report,
       ];
     default:
       return [];

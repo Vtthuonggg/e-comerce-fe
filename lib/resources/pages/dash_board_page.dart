@@ -418,7 +418,7 @@ class _DashboardPageState extends State<DashboardPage>
                 style: TextStyle(
                   color: Color(0xFF262A37),
                   fontWeight: FontWeight.w400,
-                  fontSize: 18,
+                  fontSize: 16,
                 ),
               ),
             ],

@@ -108,12 +108,11 @@ class RoomApiService extends BaseApiService {
   }
 
   addTableBulk(List listTable) {
+    log(listTable.toString());
     return network(
       request: (request) => request.post(
         "/room/list",
-        data: {
-          "data": listTable,
-        },
+        data: listTable,
       ),
       handleFailure: (error) {
         throw error;

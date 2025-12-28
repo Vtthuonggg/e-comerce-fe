@@ -115,7 +115,7 @@ class _ListProductPageState extends NyState<ListProductPage> {
             padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                PlaceholderFoodImage(),
+                _buildItemImage(product),
                 const SizedBox(width: 16),
                 Expanded(child: _buildProductInfo(product)),
                 _buildPopupMenu(product),
@@ -128,6 +128,33 @@ class _ListProductPageState extends NyState<ListProductPage> {
           child: Divider(height: 1, color: Colors.grey[300]),
         ),
       ],
+    );
+  }
+
+  Widget _buildItemImage(Product item) {
+    final dynamic img = (item as dynamic).image;
+    final bool hasImage = img != null && img.toString().isNotEmpty;
+
+    return Container(
+      width: 80,
+      height: 80,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: hasImage ? null : Colors.grey.shade100,
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: hasImage
+            ? Image.network(
+                img.toString(),
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) =>
+                    PlaceholderFoodImage(),
+              )
+            : PlaceholderFoodImage(),
+      ),
     );
   }
 

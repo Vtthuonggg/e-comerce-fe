@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+import 'package:flutter_app/app/models/user.dart';
 import 'package:flutter_app/resources/pages/order/select_multi_product_page.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,6 +20,7 @@ import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:gal/gal.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 enum TableStatus { free, using, preOrder }
 
@@ -93,6 +97,16 @@ extension TableStatusExtension on TableStatus {
               ],
             ),
             value: "edit",
+          ),
+          PopupMenuItem(
+            child: Row(
+              children: [
+                Icon(Icons.qr_code, size: 18, color: Colors.purple),
+                SizedBox(width: 8),
+                Text("Mã QR", style: TextStyle(fontSize: 14)),
+              ],
+            ),
+            value: "qr_code",
           ),
           PopupMenuDivider(),
           PopupMenuItem(
@@ -321,9 +335,8 @@ class _TableItemState extends State<TableItem> {
   }
 
   num getFinalPrice(dynamic order) {
-    num retailCost = order['order_retail_cost'] ?? 0;
-    num otherFee = order['order_service_fee'] ?? 0;
-    return retailCost + otherFee;
+    num retailCost = order['retail_cost'] ?? 0;
+    return retailCost;
   }
 
   String getCustomerName(dynamic order) {
@@ -795,11 +808,197 @@ class _TableItemState extends State<TableItem> {
             case "delete":
               showRemoveDialog();
               break;
-
+            case "qr_code":
+              showQRCodeDialog();
+              break;
             default:
           }
         },
       ),
+    );
+  }
+
+  String generateQRCodeUrl() {
+    final userApiKey = Auth.user<User>()?.apiKey ?? '';
+    final roomName = Uri.encodeComponent(widget.name);
+    final roomIdBytes = utf8.encode(widget.id.toString());
+    final roomIdBase64 = base64.encode(roomIdBytes);
+    final baseUrl = getEnv('ORDER_TABLE_URL');
+    String url =
+        "$baseUrl?roomName=$roomName&apiKey=$userApiKey&roomId=$roomIdBase64";
+    log(url.toString());
+    return url;
+  }
+
+  void showQRCodeDialog() {
+    final qrUrl = generateQRCodeUrl();
+    final GlobalKey qrKey = GlobalKey();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final isTablet = screenWidth >= 600;
+
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: isTablet ? 400 : double.infinity,
+            ),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [
+                  ThemeColor.get(context).primaryAccent.withOpacity(0.1),
+                  Colors.blue.withOpacity(0.1),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: ThemeColor.get(context).primaryAccent,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        Icons.qr_code,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Mã QR - ${widget.name}',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Text(
+                            'Khu vực: ${widget.areaName}',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                RepaintBoundary(
+                  key: qrKey,
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          'QUÉT MÃ QR ĐỂ GỌI MÓN',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        QrImageView(
+                          data: qrUrl,
+                          version: QrVersions.auto,
+                          size: 200.0,
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                          errorStateBuilder: (cxt, err) {
+                            return Container(
+                              child: Center(
+                                child: Text(
+                                  "Lỗi tạo mã QR",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(height: 12),
+                        Text(
+                          '${widget.name} - ${widget.areaName}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _downloadQRImage(qrKey),
+                        icon: Icon(Icons.download, size: 16),
+                        label: Text(
+                          'Tải QR',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor:
+                              ThemeColor.get(context).primaryAccent,
+                          side: BorderSide(
+                              color: ThemeColor.get(context).primaryAccent),
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: Icon(Icons.close, size: 16),
+                        label: Text('Đóng'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              ThemeColor.get(context).primaryAccent,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:collection/collection.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_app/app/models/Ingredient.dart';
 import 'package:flutter_app/app/models/category.dart';
 import 'package:flutter_app/app/models/product.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
+import 'package:flutter_app/app/utils/cloudinary.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/category/category_select_multi.dart';
@@ -17,6 +19,7 @@ import 'package:flutter_app/resources/widgets/select_multi_ingredient.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 class EditProductPage extends NyStatefulWidget {
@@ -40,6 +43,9 @@ class _EditProductPageState extends NyState<EditProductPage> {
   List<CategoryModel> selectedCates = [];
   final _selectIngMultiKey = GlobalKey<DropdownSearchState<Ingredient>>();
   List<Ingredient> selectedIng = [];
+  File? _imageFile;
+  String? _imageUrl; // existing remote image
+  final ImagePicker _picker = ImagePicker();
   @override
   void initState() {
     super.initState();
@@ -60,8 +66,19 @@ class _EditProductPageState extends NyState<EditProductPage> {
       'stock': roundQuantity(data.stock ?? 0),
       'unit': data.unit ?? '',
     });
+    final img = data.image;
+    if (img != null && img.toString().isNotEmpty) {
+      setState(() => _imageUrl = img.toString());
+    }
     selectedIng = data.ingredients ?? [];
     setState(() {});
+  }
+
+  void _removeImage() {
+    setState(() {
+      _imageFile = null;
+      _imageUrl = null;
+    });
   }
 
   Future saveProduct() async {
@@ -78,6 +95,15 @@ class _EditProductPageState extends NyState<EditProductPage> {
       setState(() {
         _isLoading = true;
       });
+      String imageUrl = _imageUrl ?? '';
+      try {
+        // if user picked a new file, upload it and get url
+        if (_imageFile != null) {
+          imageUrl = (await getImageCloudinaryUrl(_imageFile!)) ?? '';
+        }
+      } catch (e) {
+        log('Upload image error: $e');
+      }
 
       final formData = _formKey.currentState!.value;
       var payload = {
@@ -98,6 +124,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
                   'quantity': e.quantity ?? 0,
                 })
             .toList(),
+        'image': imageUrl.isEmpty ? null : imageUrl,
       };
 
       try {
@@ -142,6 +169,51 @@ class _EditProductPageState extends NyState<EditProductPage> {
                 .firstWhereOrNull((element) => element.id == i.id) ==
             null);
       }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final ImageSource? source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Wrap(
+          children: [
+            ListTile(
+              leading: Icon(Icons.photo_library),
+              title: Text('Chọn từ thư viện'),
+              onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+            ),
+            ListTile(
+              leading: Icon(Icons.camera_alt),
+              title: Text('Chụp ảnh'),
+              onTap: () => Navigator.of(context).pop(ImageSource.camera),
+            ),
+            ListTile(
+              leading: Icon(Icons.close),
+              title: Text('Hủy'),
+              onTap: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (source == null) return;
+
+    try {
+      final XFile? picked = await _picker.pickImage(
+        source: source,
+        maxWidth: 1600,
+        imageQuality: 85,
+      );
+      if (picked != null) {
+        setState(() {
+          _imageFile = File(picked.path);
+          _imageUrl = null;
+        });
+      }
+    } catch (e) {
+      log('Image pick error: $e');
     }
   }
 
@@ -284,9 +356,59 @@ class _EditProductPageState extends NyState<EditProductPage> {
                     addMultiIngredient(listIngredient ?? []);
                   },
                   selectedItems: selectedIng,
+                  isShowList: true,
                 ),
                 SizedBox(height: 24),
-
+                if (_imageFile == null &&
+                    (_imageUrl == null || _imageUrl!.isEmpty)) ...[
+                  OutlinedButton.icon(
+                    onPressed: _pickImage,
+                    icon: Icon(Icons.image),
+                    label: Text('Chọn ảnh hoặc chụp'),
+                  ),
+                ] else ...[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: _imageFile != null
+                              ? Image.file(_imageFile!,
+                                  width: 96, height: 96, fit: BoxFit.cover)
+                              : Image.network(_imageUrl!,
+                                  width: 96, height: 96, fit: BoxFit.cover),
+                        ),
+                        Positioned(
+                          right: -8,
+                          top: -8,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              icon: Container(
+                                height: 28,
+                                width: 28,
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                  border:
+                                      Border.all(color: Colors.white, width: 2),
+                                ),
+                                child: Icon(Icons.close,
+                                    color: Colors.white, size: 16),
+                              ),
+                              onPressed: _removeImage,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                SizedBox(height: 32),
                 // Nút Lưu
                 ElevatedButton(
                   onPressed: _isLoading ? null : saveProduct,

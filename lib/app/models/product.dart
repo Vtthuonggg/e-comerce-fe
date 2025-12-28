@@ -15,6 +15,7 @@ class Product extends Model {
   String? image;
   String? unit;
   List<Ingredient>? ingredients;
+  num quantity = 1;
   Product({
     this.name,
     this.retailCost,
@@ -37,7 +38,6 @@ class Product extends Model {
     ingredients = (data['ingredients'] as List<dynamic>?)
         ?.map((e) => Ingredient.fromJson(e))
         .toList();
-    log(ingredients!.length!.toString());
   }
 
   @override

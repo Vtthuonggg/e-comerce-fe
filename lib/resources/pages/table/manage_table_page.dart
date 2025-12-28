@@ -91,7 +91,7 @@ class _ManageTablePageState extends NyState<ManageTablePage> {
           : [type];
       filteredAreas = filteredAreas.map((area) {
         var filteredRooms = area.rooms
-            .where((room) => typesToFilter.contains(room['status']))
+            .where((room) => typesToFilter.contains(room['type']))
             .toList();
         return Area(
           id: area.id,

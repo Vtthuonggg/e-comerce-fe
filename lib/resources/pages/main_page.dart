@@ -1,6 +1,7 @@
 // lib/main_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_app/app/utils/global_socket_service.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/common_define.dart';
 import 'package:flutter_app/resources/pages/dash_board_page.dart';
@@ -38,7 +39,7 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _MainPageState extends State<MainPage> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _mainScaffoldKey = GlobalKey<ScaffoldState>();
   final PersistentTabController _tabController =
       PersistentTabController(initialIndex: 0);
@@ -47,11 +48,31 @@ class _MainPageState extends State<MainPage> {
   @override
   void initState() {
     super.initState();
+    GlobalSocketService().startListening();
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        GlobalSocketService().startListening();
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.hidden:
+        GlobalSocketService().stopListening();
+        break;
+      default:
+        break;
+    }
   }
 
   final GlobalKey<NavigatorState> _homeNavKey = GlobalKey<NavigatorState>();
