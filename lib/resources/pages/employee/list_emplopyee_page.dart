@@ -6,6 +6,7 @@ import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/pages/employee/edit_employee_page.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
@@ -142,18 +143,11 @@ class _ListEmployeePageState extends NyState<ListEmployeePage> {
                     child: Text('Thử lại'),
                   ),
                 ),
-                firstPageProgressIndicatorBuilder: (context) => Center(
-                  child: CircularProgressIndicator(
-                    color: ThemeColor.get(context).primaryAccent,
-                  ),
-                ),
+                firstPageProgressIndicatorBuilder: (context) =>
+                    Center(child: AppLoading()),
                 newPageProgressIndicatorBuilder: (context) => Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: CircularProgressIndicator(
-                      color: ThemeColor.get(context).primaryAccent,
-                    ),
-                  ),
+                  child:
+                      Padding(padding: EdgeInsets.all(16), child: AppLoading()),
                 ),
                 itemBuilder: (context, item, index) => _buildEmployeeCard(item),
                 noItemsFoundIndicatorBuilder: (_) => Center(

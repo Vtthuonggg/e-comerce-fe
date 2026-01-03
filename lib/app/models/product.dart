@@ -1,9 +1,20 @@
-import 'dart:developer';
-
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_app/app/models/Ingredient.dart';
 import 'package:flutter_app/app/models/category.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+
+enum DiscountType { percent, price }
+
+extension DiscountTypeExtension on DiscountType {
+  int getValueRequest() {
+    switch (this) {
+      case DiscountType.percent:
+        return 2;
+      case DiscountType.price:
+        return 1;
+    }
+  }
+}
 
 class Product extends Model {
   int? id;
@@ -16,13 +27,28 @@ class Product extends Model {
   String? unit;
   List<Ingredient>? ingredients;
   num quantity = 1;
+  bool isSelected = false;
+  num? discount;
+  DiscountType discountType = DiscountType.percent;
+  String? note;
+  bool isManuallyEdited = false;
+  num? overriddenPrice;
+
+  // Text controllers
+  final TextEditingController txtQuantity = TextEditingController();
+  final TextEditingController txtPrice = TextEditingController();
+  final TextEditingController txtDiscount = TextEditingController();
+  final TextEditingController txtNote = TextEditingController();
+
   Product({
     this.name,
     this.retailCost,
     this.baseCost,
     this.stock,
     this.image,
-  });
+  }) {
+    txtQuantity.text = '1';
+  }
 
   Product.fromJson(dynamic data) {
     id = data['id'];
@@ -38,6 +64,7 @@ class Product extends Model {
     ingredients = (data['ingredients'] as List<dynamic>?)
         ?.map((e) => Ingredient.fromJson(e))
         .toList();
+    txtQuantity.text = '1';
   }
 
   @override
@@ -51,4 +78,10 @@ class Product extends Model {
         "image": image,
         "unit": unit,
       };
+  void dispose() {
+    txtQuantity.dispose();
+    txtPrice.dispose();
+    txtDiscount.dispose();
+    txtNote.dispose();
+  }
 }

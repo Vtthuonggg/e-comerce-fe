@@ -11,6 +11,7 @@ import 'package:flutter_app/config/storage_keys.dart';
 import 'package:flutter_app/resources/pages/login_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
 import 'package:flutter_app/resources/themes/styles/light_theme_colors.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
@@ -382,6 +383,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _checkUserToken() async {
+    await Future.delayed(Duration(milliseconds: 700));
     String? userToken = await NyStorage.read(StorageKey.userToken);
     if (userToken != null) {
       try {
@@ -403,10 +405,8 @@ class _SplashScreenState extends State<SplashScreen> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Transform.scale(
-              scale: 0.5, child: Image.asset('public/assets/images/bate.png')),
-          CircularProgressIndicator(
-            color: Colors.blue,
-          )
+              scale: 0.3, child: Image.asset('public/assets/images/icon.png')),
+          AppLoading()
         ],
       ),
     );

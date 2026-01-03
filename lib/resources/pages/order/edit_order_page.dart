@@ -1,6 +1,9 @@
+// File: lib/resources/pages/order/edit_order_page.dart
+
 import 'dart:async';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_app/app/controllers/controller.dart';
 import 'package:flutter_app/app/models/customer.dart';
 import 'package:flutter_app/app/models/product.dart';
@@ -10,13 +13,14 @@ import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/pages/order/select_multi_product_page.dart';
-import 'package:flutter_app/resources/widgets/select_customer.dart';
+import 'package:flutter_app/resources/pages/table/table_item.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:dropdown_search/dropdown_search.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:nylo_framework/nylo_framework.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 
 class EditOrderPage extends NyStatefulWidget {
   static const path = '/edit-order';
@@ -28,16 +32,21 @@ class EditOrderPage extends NyStatefulWidget {
 }
 
 class _EditOrderPageState extends NyState<EditOrderPage> {
+  final discountController = TextEditingController();
+  final paidController = TextEditingController();
   final _formKey = GlobalKey<FormBuilderState>();
-  final _customerSelectKey = GlobalKey<DropdownSearchState<Customer>>();
 
-  List<Product> _selectedProducts = [];
-  bool _isSubmitting = false;
+  List<Product> selectedItems = [];
+  bool _isLoading = false;
+  DiscountType _discountType = DiscountType.percent;
+  Customer? selectedCustomer;
+  int selectPaymentType = 1;
 
   String get roomName => widget.data()?['room_name'] ?? '';
   String get areaName => widget.data()?['area_name'] ?? '';
   int? get roomId => widget.data()?['room_id'];
-  String? get roomType => widget.data()?['room_type'];
+  TableStatus get currentRoomType =>
+      TableStatusExtension.fromValue(widget.data()?['room_type'] ?? 'free');
 
   @override
   void initState() {
@@ -45,26 +54,122 @@ class _EditOrderPageState extends NyState<EditOrderPage> {
     _initializeOrderData();
   }
 
+  @override
+  void dispose() {
+    discountController.dispose();
+    paidController.dispose();
+    for (var item in selectedItems) {
+      item.dispose();
+    }
+    super.dispose();
+  }
+
   void _initializeOrderData() {
     final selectedProducts =
         widget.data()?['selected_products'] as List<Product>? ?? [];
-    _selectedProducts = List<Product>.from(selectedProducts);
+    selectedItems = List<Product>.from(selectedProducts);
+    updatePaid();
+  }
+
+  void addItem(Product item) {
+    var index = selectedItems.indexWhere((element) => element.id == item.id);
+    if (index == -1) {
+      item.isSelected = true;
+      item.quantity = 1;
+      item.txtQuantity.text = '1';
+      item.txtPrice.text = vnd.format(item.retailCost ?? 0);
+      item.txtDiscount.text = '0';
+      item.discount = 0;
+      selectedItems.add(item);
+    } else {
+      selectedItems[index].quantity++;
+      selectedItems[index].txtQuantity.text =
+          roundQuantity(selectedItems[index].quantity);
+    }
+    resetItemPrice();
+    updatePaid();
     setState(() {});
   }
 
-  void _updateQuantity(Product product, int delta) {
+  void removeItem(Product item) {
+    item.isSelected = false;
+    item.quantity = 1;
+    item.discount = 0;
+    item.discountType = DiscountType.percent;
+    item.txtQuantity.text = '1';
+    item.txtPrice.text = vnd.format(0);
+    item.txtDiscount.text = '0';
     setState(() {
-      product.quantity += delta;
-      if (product.quantity <= 0) {
-        _selectedProducts.removeWhere((p) => p.id == product.id);
-      }
+      selectedItems.removeWhere((element) => element.id == item.id);
+      resetItemPrice();
     });
+    updatePaid();
   }
 
-  void _removeItem(Product product) {
-    setState(() {
-      _selectedProducts.removeWhere((p) => p.id == product.id);
-    });
+  void resetItemPrice() {
+    for (var item in selectedItems) {
+      if (!item.isManuallyEdited) {
+        num price = item.retailCost ?? 0;
+        item.txtPrice.text = vnd.format(price);
+      }
+    }
+  }
+
+  void updatePaid() {
+    num finalPrice = getFinalPrice();
+    paidController.text = vnd.format(finalPrice);
+    setState(() {});
+  }
+
+  num getTotalPrice() {
+    num total = 0;
+    for (var item in selectedItems) {
+      num price = stringToInt(item.txtPrice.text) ?? item.retailCost ?? 0;
+      num quantity = item.quantity;
+      num itemTotal = price * quantity;
+
+      num discountVal = item.discount ?? 0;
+      num discountPrice = item.discountType == DiscountType.percent
+          ? itemTotal * discountVal / 100
+          : discountVal;
+
+      total += (itemTotal - discountPrice);
+    }
+    return total;
+  }
+
+  num getTotalQty() {
+    num total = 0;
+    for (var item in selectedItems) {
+      total += item.quantity;
+    }
+    return total;
+  }
+
+  num getFinalPrice() {
+    num total = getTotalPrice();
+
+    // Apply order discount
+    num orderDiscount = stringToInt(discountController.text) ?? 0;
+    if (orderDiscount > 0) {
+      if (_discountType == DiscountType.percent) {
+        total = total - (total * orderDiscount / 100);
+      } else {
+        total = total - orderDiscount;
+      }
+    }
+
+    return total < 0 ? 0 : total;
+  }
+
+  num getPaid() {
+    return stringToInt(_formKey.currentState?.value['paid'] ?? '0') ?? 0;
+  }
+
+  num getDebt() {
+    num finalPrice = getFinalPrice();
+    num paid = getPaid();
+    return paid - finalPrice;
   }
 
   Future<void> _selectMoreProducts() async {
@@ -75,90 +180,76 @@ class _EditOrderPageState extends NyState<EditOrderPage> {
         'room_name': roomName,
         'area_name': areaName,
         'room_id': roomId,
-        'room_type': roomType,
+        'room_type': currentRoomType.toValue(),
+        'items': selectedItems,
       },
     );
 
     if (result != null && result is List<Product>) {
       setState(() {
         for (var newProduct in result) {
-          final existingIndex =
-              _selectedProducts.indexWhere((p) => p.id == newProduct.id);
-          if (existingIndex != -1) {
-            // Cộng dồn số lượng nếu đã có
-            _selectedProducts[existingIndex].quantity += newProduct.quantity;
-          } else {
-            // Thêm mới
-            _selectedProducts.add(newProduct);
-          }
+          addItem(newProduct);
         }
       });
     }
   }
 
-  Future<void> _submitOrder({required bool isPayment}) async {
+  Future submit(TableStatus roomType, {bool isPay = false}) async {
     if (!_formKey.currentState!.saveAndValidate()) {
       CustomToast.showToastWarning(context,
           description: "Vui lòng điền đầy đủ thông tin");
       return;
     }
 
-    if (_selectedProducts.isEmpty) {
+    if (selectedItems.isEmpty) {
       CustomToast.showToastWarning(context,
           description: "Vui lòng chọn ít nhất 1 sản phẩm");
       return;
     }
 
-    setState(() => _isSubmitting = true);
+    setState(() => _isLoading = true);
 
     try {
-      final formData = _formKey.currentState!.value;
-
-      // Build order_detail array
+      // Build order_detail
       List<Map<String, dynamic>> orderDetail = [];
-      for (var product in _selectedProducts) {
-        final priceKey = 'price_${product.id}';
-        final discountKey = 'discount_${product.id}';
-        final discountTypeKey = 'discount_type_${product.id}';
-        final noteKey = 'note_${product.id}';
+      for (var product in selectedItems) {
+        num price =
+            stringToInt(product.txtPrice.text) ?? product.retailCost ?? 0;
+        num discount = product.discount ?? 0;
 
         orderDetail.add({
           'product_id': product.id,
           'quantity': product.quantity,
-          'user_price': formData[priceKey] ?? product.retailCost ?? 0,
-          if (formData[discountKey] != null && formData[discountKey] > 0)
-            'discount': formData[discountKey],
-          if (formData[discountTypeKey] != null)
-            'discount_type': formData[discountTypeKey],
-          if (formData[noteKey] != null &&
-              formData[noteKey].toString().isNotEmpty)
-            'note': formData[noteKey],
+          'retail_cost': price,
+          if (discount > 0) 'discount': discount,
+          if (discount > 0)
+            'discount_type': product.discountType.getValueRequest(),
+          if (product.note != null && product.note!.isNotEmpty)
+            'note': product.note,
         });
       }
 
       // Build payload
       Map<String, dynamic> payload = {
-        'type': 1, // Đơn bán
+        'type': 1,
         'room_id': roomId,
-        // Thanh toán → bàn free, Tạo đơn → bàn using
-        'room_type': isPayment ? 'free' : 'using',
-        if (formData['customer_id'] != null)
-          'customer_id': formData['customer_id'],
+        'room_type': isPay ? TableStatus.free.toValue() : roomType.toValue(),
+        if (selectedCustomer != null) 'customer_id': selectedCustomer!.id,
         'order_detail': orderDetail,
         'payment': {
-          'type': formData['payment_type'] ?? 1,
-          'price': formData['payment_price'] ?? 0,
+          'type': selectPaymentType,
+          'price': stringToInt(paidController.text) ?? 0,
         },
-        if (formData['order_note'] != null &&
-            formData['order_note'].toString().isNotEmpty)
-          'note': formData['order_note'],
-        if (formData['order_discount'] != null &&
-            formData['order_discount'] > 0)
-          'discount': formData['order_discount'],
-        if (formData['order_discount_type'] != null)
-          'discount_type': formData['order_discount_type'],
-        // Thanh toán → status = 2, Tạo đơn → status = 1
-        'status_order': isPayment ? 2 : 1,
+        if (_formKey.currentState?.value['order_note'] != null &&
+            _formKey.currentState!.value['order_note'].toString().isNotEmpty)
+          'note': _formKey.currentState!.value['order_note'],
+        if (stringToInt(discountController.text) != null &&
+            stringToInt(discountController.text)! > 0)
+          'discount': stringToInt(discountController.text),
+        if (stringToInt(discountController.text) != null &&
+            stringToInt(discountController.text)! > 0)
+          'discount_type': _discountType.getValueRequest(),
+        'status_order': isPay ? 4 : 2,
       };
 
       log('Payload: ${payload.toString()}');
@@ -166,302 +257,113 @@ class _EditOrderPageState extends NyState<EditOrderPage> {
 
       CustomToast.showToastSuccess(context,
           description:
-              isPayment ? "Thanh toán thành công" : "Tạo đơn hàng thành công");
+              isPay ? "Thanh toán thành công" : "Tạo đơn hàng thành công");
       Navigator.pop(context, true);
     } catch (error) {
       CustomToast.showToastError(context, description: getResponseError(error));
     } finally {
-      setState(() => _isSubmitting = false);
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: ThemeColor.get(context).primaryAccent,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back_ios_new, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Tạo đơn bán - $areaName - $roomName',
+          'Đặt bàn',
           style: TextStyle(
-              color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600),
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add, color: Colors.white),
+            onPressed: _selectMoreProducts,
+          ),
+        ],
       ),
-      body: FormBuilder(
-        key: _formKey,
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(16.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Customer Selection
-                    _buildSectionCard(
-                      title: 'Thông tin khách hàng',
-                      child: CustomerSelect(
-                        selectKey: _customerSelectKey,
-                        labelText: 'Chọn khách hàng',
-                        hintText: 'Tìm kiếm khách hàng...',
-                        onSelect: (customer) {
-                          _formKey.currentState?.fields['customer_id']
-                              ?.didChange(customer?.id);
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-
-                    // Product List
-                    _buildSectionCard(
-                      title: 'Danh sách sản phẩm',
-                      child: Column(
-                        children: [
-                          if (_selectedProducts.isEmpty)
-                            Center(
-                              child: Padding(
-                                padding: EdgeInsets.all(20.h),
-                                child: Text(
-                                  'Chưa có sản phẩm nào',
-                                  style: TextStyle(
-                                      color: Colors.grey[600], fontSize: 14.sp),
-                                ),
-                              ),
-                            )
-                          else
-                            ..._selectedProducts.map((product) {
-                              return _buildProductItemCard(product);
-                            }).toList(),
-                          SizedBox(height: 10.h),
-                          ElevatedButton.icon(
-                            onPressed: _selectMoreProducts,
-                            icon: Icon(Icons.add, color: Colors.white),
-                            label: Text('Chọn thêm sản phẩm',
-                                style: TextStyle(color: Colors.white)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  ThemeColor.get(context).primaryAccent,
-                              minimumSize: Size(double.infinity, 45.h),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-
-                    // Order Discount & Note
-                    _buildSectionCard(
-                      title: 'Giảm giá & Ghi chú đơn hàng',
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: FormBuilderTextField(
-                                  name: 'order_discount',
-                                  decoration: InputDecoration(
-                                    labelText: 'Giảm giá',
-                                    border: OutlineInputBorder(),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 12.h),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  validator: FormBuilderValidators.compose([
-                                    FormBuilderValidators.numeric(),
-                                    FormBuilderValidators.min(0),
-                                  ]),
-                                ),
-                              ),
-                              SizedBox(width: 10.w),
-                              Expanded(
-                                child: FormBuilderDropdown<int>(
-                                  name: 'order_discount_type',
-                                  decoration: InputDecoration(
-                                    labelText: 'Loại',
-                                    border: OutlineInputBorder(),
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 12.w, vertical: 12.h),
-                                  ),
-                                  items: [
-                                    DropdownMenuItem(
-                                        value: 1, child: Text('VNĐ')),
-                                    DropdownMenuItem(
-                                        value: 2, child: Text('%')),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 12.h),
-                          FormBuilderTextField(
-                            name: 'order_note',
-                            decoration: InputDecoration(
-                              labelText: 'Ghi chú',
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12.w, vertical: 12.h),
-                            ),
-                            maxLines: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-
-                    // Payment
-                    _buildSectionCard(
-                      title: 'Thanh toán',
-                      child: Column(
-                        children: [
-                          FormBuilderDropdown<int>(
-                            name: 'payment_type',
-                            decoration: InputDecoration(
-                              labelText: 'Phương thức',
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12.w, vertical: 12.h),
-                            ),
-                            initialValue: 1,
-                            validator: FormBuilderValidators.required(),
-                            items: [
-                              DropdownMenuItem(
-                                  value: 1, child: Text('Tiền mặt')),
-                              DropdownMenuItem(
-                                  value: 2, child: Text('Chuyển khoản')),
-                              DropdownMenuItem(
-                                  value: 3, child: Text('Quẹt thẻ')),
-                            ],
-                          ),
-                          SizedBox(height: 12.h),
-                          FormBuilderTextField(
-                            name: 'payment_price',
-                            decoration: InputDecoration(
-                              labelText: 'Số tiền thanh toán',
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12.w, vertical: 12.h),
-                              suffixText: 'VNĐ',
-                            ),
-                            keyboardType: TextInputType.number,
-                            initialValue: '0',
-                            validator: FormBuilderValidators.compose([
-                              FormBuilderValidators.required(),
-                              FormBuilderValidators.numeric(),
-                              FormBuilderValidators.min(0),
-                            ]),
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: 100.h),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: Offset(0, -2),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Row(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
             children: [
-              // Button Tạo đơn (status_order = 1, room_type = using)
               Expanded(
-                child: ElevatedButton(
-                  onPressed: _isSubmitting
-                      ? null
-                      : () => _submitOrder(isPayment: false),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[600],
-                    minimumSize: Size(double.infinity, 50.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: _isSubmitting
-                      ? SizedBox(
-                          height: 20.h,
-                          width: 20.h,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      buildBreadCrumb(),
+                      FormBuilder(
+                        key: _formKey,
+                        onChanged: () {
+                          _formKey.currentState!.save();
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Icon(Icons.shopping_cart, color: Colors.white),
-                            SizedBox(width: 8.w),
-                            Text(
-                              'Tạo đơn',
-                              style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white),
+                            buildCustomerDetail(),
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 0.0, horizontal: 6.0),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                      color: Colors.grey[200] ?? Colors.grey),
+                                  left: BorderSide(
+                                      color: Colors.grey[200] ?? Colors.grey),
+                                  right: BorderSide(
+                                      color: Colors.grey[200] ?? Colors.grey),
+                                  top: BorderSide(
+                                      color: Colors.grey[200] ?? Colors.grey),
+                                ),
+                                borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(10.0),
+                                    topRight: Radius.circular(10.0)),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
+                                child: Text.rich(
+                                  TextSpan(
+                                    text: 'Tổng SL món: ',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600]),
+                                    children: <TextSpan>[
+                                      TextSpan(
+                                        text: '${roundQuantity(getTotalQty())}',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
+                            SizedBox(height: 20),
+                            buildListItem(),
+                            buildSummary(),
+                            Divider(),
+                            buildNote(),
                           ],
                         ),
-                ),
-              ),
-              SizedBox(width: 12.w),
-              // Button Thanh toán (status_order = 2, room_type = free)
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: _isSubmitting
-                      ? null
-                      : () => _submitOrder(isPayment: true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green[600],
-                    minimumSize: Size(double.infinity, 50.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                      ),
+                      SizedBox(height: 20),
+                    ],
                   ),
-                  child: _isSubmitting
-                      ? SizedBox(
-                          height: 20.h,
-                          width: 20.h,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.payment, color: Colors.white),
-                            SizedBox(width: 8.w),
-                            Text(
-                              'Thanh toán',
-                              style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white),
-                            ),
-                          ],
-                        ),
                 ),
               ),
+              SizedBox(height: 10),
+              buildMainActionButton(context),
+              SizedBox(height: 20),
             ],
           ),
         ),
@@ -469,201 +371,791 @@ class _EditOrderPageState extends NyState<EditOrderPage> {
     );
   }
 
-  Widget _buildSectionCard({required String title, required Widget child}) {
-    return Card(
-      elevation: 1,
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: EdgeInsets.all(16.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 16.sp,
+  Widget buildBreadCrumb() {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 12),
+      child: Row(
+        children: [
+          Icon(Icons.table_restaurant,
+              size: 20, color: ThemeColor.get(context).primaryAccent),
+          SizedBox(width: 8),
+          Text(
+            '$areaName - $roomName',
+            style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 12.h),
-            child,
-          ],
-        ),
+                color: Colors.grey[800]),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildProductItemCard(Product product) {
-    return Card(
-      margin: EdgeInsets.only(bottom: 12.h),
-      elevation: 0,
-      color: Colors.grey[50],
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: Colors.grey[300]!),
+  Widget buildCustomerDetail() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
       ),
-      child: Padding(
-        padding: EdgeInsets.all(12.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                // Product Image
-                Container(
-                  width: 60.w,
-                  height: 60.w,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.person_outline, size: 18, color: Colors.grey[700]),
+              SizedBox(width: 8),
+              Text(
+                'Thông tin khách hàng',
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800]),
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          InkWell(
+            onTap: () {
+              // TODO: Show customer selection dialog
+            },
+            child: Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    selectedCustomer?.name ?? 'Chọn khách hàng',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: selectedCustomer != null
+                            ? Colors.black
+                            : Colors.grey[600]),
                   ),
-                  child: product.image != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            product.image!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
-                                Icon(Icons.image, color: Colors.grey[500]),
-                          ),
-                        )
-                      : Icon(Icons.image, color: Colors.grey[500]),
+                  Icon(Icons.arrow_forward_ios,
+                      size: 14, color: Colors.grey[600]),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildListItem() {
+    return Column(
+      children: selectedItems.map((item) {
+        return buildItem(item, selectedItems.indexOf(item));
+      }).toList(),
+    );
+  }
+
+  Widget buildItem(Product item, int index) {
+    return Container(
+      margin: EdgeInsets.only(bottom: 8),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Image
+              Container(
+                width: 60.w,
+                height: 60.w,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                SizedBox(width: 12.w),
-                // Product Info
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        product.name ?? '',
-                        style: TextStyle(
-                          fontSize: 15.sp,
-                          fontWeight: FontWeight.w600,
+                child: item.image != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          item.image!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              Icon(Icons.image, color: Colors.grey, size: 30),
                         ),
-                      ),
-                      SizedBox(height: 4.h),
-                      Text(
-                        vnd.format(product.retailCost),
-                        style: TextStyle(
-                          fontSize: 14.sp,
-                          color: Colors.grey[700],
+                      )
+                    : Icon(Icons.image, color: Colors.grey, size: 30),
+              ),
+              SizedBox(width: 12),
+              // Info
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name ?? '',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.w600),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
-                    ],
-                  ),
+                        SizedBox(height: 4),
+                        Text(
+                          vnd.format(item.retailCost ?? 0),
+                          style:
+                              TextStyle(fontSize: 13, color: Colors.grey[600]),
+                        ),
+                      ],
+                    ),
+                    IconButton(
+                      icon: Icon(IconsaxPlusLinear.trash,
+                          color: ThemeColor.get(context).primaryAccent,
+                          size: 20),
+                      onPressed: () {
+                        removeItem(item);
+                      },
+                    ),
+                  ],
                 ),
-                // Quantity Controls
-                Row(
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          // Quantity Control
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Số lượng',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.remove_circle_outline),
-                      color: Colors.grey[700],
-                      onPressed: () => _updateQuantity(product, -1),
-                      padding: EdgeInsets.zero,
+                      icon: Icon(Icons.remove, size: 18),
+                      onPressed: () {
+                        if (item.quantity > 1) {
+                          setState(() {
+                            item.quantity--;
+                            item.txtQuantity.text =
+                                roundQuantity(item.quantity);
+                            updatePaid();
+                          });
+                        }
+                      },
+                      padding: EdgeInsets.all(8),
                       constraints: BoxConstraints(),
                     ),
-                    SizedBox(width: 8.w),
-                    Text(
-                      '${product.quantity.toInt()}',
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.w600,
+                    Container(
+                      width: 60,
+                      child: FormBuilderTextField(
+                        name: '${item.id}.quantity',
+                        controller: item.txtQuantity,
+                        textAlign: TextAlign.center,
+                        keyboardType: TextInputType.number,
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w600),
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                        ),
+                        onChanged: (val) {
+                          num newQuantity = stringToDouble(val) ?? 0;
+                          item.quantity = newQuantity;
+                          updatePaid();
+                        },
                       ),
                     ),
-                    SizedBox(width: 8.w),
                     IconButton(
-                      icon: Icon(Icons.add_circle_outline),
-                      color: ThemeColor.get(context).primaryAccent,
-                      onPressed: () => _updateQuantity(product, 1),
-                      padding: EdgeInsets.zero,
+                      icon: Icon(Icons.add, size: 18),
+                      onPressed: () {
+                        setState(() {
+                          item.quantity++;
+                          item.txtQuantity.text = roundQuantity(item.quantity);
+                          updatePaid();
+                        });
+                      },
+                      padding: EdgeInsets.all(8),
                       constraints: BoxConstraints(),
                     ),
                   ],
                 ),
-                IconButton(
-                  icon: Icon(IconsaxPlusLinear.trash,
-                      color: Colors.red, size: 20.w),
-                  onPressed: () => _removeItem(product),
-                  padding: EdgeInsets.zero,
-                  constraints: BoxConstraints(),
-                ),
-              ],
-            ),
-            SizedBox(height: 12.h),
-            // Price
-            FormBuilderTextField(
-              name: 'price_${product.id}',
-              decoration: InputDecoration(
-                labelText: 'Giá bán',
-                border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
-                suffixText: 'VNĐ',
               ),
-              initialValue: product.retailCost?.toString() ?? '0',
-              keyboardType: TextInputType.number,
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(),
-                FormBuilderValidators.numeric(),
-                FormBuilderValidators.min(0),
-              ]),
-            ),
-            SizedBox(height: 10.h),
-            // Discount
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: FormBuilderTextField(
-                    name: 'discount_${product.id}',
-                    decoration: InputDecoration(
-                      labelText: 'Giảm giá',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12.w, vertical: 10.h),
+            ],
+          ),
+          SizedBox(height: 8),
+          // Price
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Giá bán',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
+                    SizedBox(height: 4),
+                    FormBuilderTextField(
+                      name: '${item.id}.price',
+                      controller: item.txtPrice,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(fontSize: 13),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        suffixText: 'đ',
+                        isDense: true,
+                      ),
+                      onChanged: (_) {
+                        item.isManuallyEdited = true;
+                        updatePaid();
+                      },
                     ),
-                    keyboardType: TextInputType.number,
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.numeric(),
-                      FormBuilderValidators.min(0),
-                    ]),
-                  ),
+                  ],
                 ),
-                SizedBox(width: 10.w),
-                Expanded(
-                  child: FormBuilderDropdown<int>(
-                    name: 'discount_type_${product.id}',
-                    decoration: InputDecoration(
-                      labelText: 'Loại',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12.w, vertical: 10.h),
-                    ),
-                    items: [
-                      DropdownMenuItem(value: 1, child: Text('VNĐ')),
-                      DropdownMenuItem(value: 2, child: Text('%')),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.h),
-            // Note
-            FormBuilderTextField(
-              name: 'note_${product.id}',
-              decoration: InputDecoration(
-                labelText: 'Ghi chú',
-                border: OutlineInputBorder(),
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
               ),
-              maxLines: 2,
+            ],
+          ),
+          SizedBox(height: 8),
+          // Discount
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Giảm giá',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
+                    SizedBox(height: 4),
+                    FormBuilderTextField(
+                      name: '${item.id}.discount',
+                      controller: item.txtDiscount,
+                      keyboardType: TextInputType.number,
+                      style: TextStyle(fontSize: 13),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        isDense: true,
+                      ),
+                      onChanged: (val) {
+                        setState(() {
+                          item.discount = num.tryParse(val ?? '0') ?? 0;
+                          updatePaid();
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Loại',
+                        style: TextStyle(
+                            fontSize: 13, fontWeight: FontWeight.w500)),
+                    SizedBox(height: 4),
+                    DropdownButtonFormField<DiscountType>(
+                      value: item.discountType,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8)),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        isDense: true,
+                      ),
+                      items: [
+                        DropdownMenuItem(
+                            value: DiscountType.price, child: Text('đ')),
+                        DropdownMenuItem(
+                            value: DiscountType.percent, child: Text('%')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() {
+                            item.discountType = val;
+                            updatePaid();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          // Note
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Ghi chú',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+              SizedBox(height: 4),
+              FormBuilderTextField(
+                name: '${item.id}.note',
+                style: TextStyle(fontSize: 13),
+                onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  isDense: true,
+                  hintText: 'Nhập ghi chú...',
+                ),
+                maxLines: 1,
+                onChanged: (val) {
+                  item.note = val;
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+                'Tổng tiền: ${vnd.format((stringToInt(item.txtPrice.text) ?? 0) * item.quantity - (item.discountType == DiscountType.percent ? ((stringToInt(item.txtPrice.text) ?? 0) * item.quantity * (item.discount ?? 0) / 100) : (item.discount ?? 0)))}',
+                style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800])),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildSummary() {
+    return Column(
+      children: [
+        SizedBox(height: 12),
+        buildOrderDiscount(),
+        SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Tổng tiền T.Toán',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(
+              height: 40,
+              width: 180,
+              child: FormBuilderTextField(
+                name: 'total_price',
+                enabled: false,
+                controller: TextEditingController(
+                    text: vnd.format(roundMoney(getFinalPrice()))),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.right,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                  disabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.grey),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: '',
+                  suffixText: '',
+                ),
+              ),
+            )
+          ],
+        ),
+        SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Khách T.Toán', style: TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                    height: 45,
+                    width: 180,
+                    child: FormBuilderTextField(
+                      keyboardType: TextInputType.number,
+                      name: 'paid',
+                      controller: paidController,
+                      onTapOutside: (event) {
+                        FocusScope.of(context).unfocus();
+                      },
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.right,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      onTap: () {
+                        _formKey.currentState!.patchValue({'paid': ''});
+                      },
+                      inputFormatters: [
+                        CurrencyTextInputFormatter(
+                          locale: 'vi',
+                          symbol: '',
+                        )
+                      ],
+                      decoration: InputDecoration(
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        suffixText: 'đ',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+        if (getDebt() != 0)
+          Column(
+            children: [
+              SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(getDebt() > 0 ? 'Tiền thừa' : 'Còn nợ',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  SizedBox(
+                    height: 40,
+                    width: 180,
+                    child: FormBuilderTextField(
+                      name: 'debt',
+                      enabled: false,
+                      controller: TextEditingController(
+                          text: vnd.format(getDebt().abs())),
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.right,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        disabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        floatingLabelBehavior: FloatingLabelBehavior.never,
+                        hintText: '',
+                        suffixText: '',
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ],
+          ),
+        SizedBox(height: 12),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text('Hình thức T.Toán',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            SizedBox(
+              width: 180,
+              height: 40,
+              child: FormBuilderDropdown<int>(
+                name: 'payment_type',
+                initialValue: selectPaymentType,
+                decoration: InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide(
+                      color: ThemeColor.get(context).primaryAccent,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  isDense: true,
+                ),
+                items: [
+                  DropdownMenuItem(value: 1, child: Text('Tiền mặt')),
+                  DropdownMenuItem(value: 2, child: Text('Chuyển khoản')),
+                  DropdownMenuItem(value: 3, child: Text('Quẹt thẻ')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      selectPaymentType = val;
+                    });
+                  }
+                },
+              ),
             ),
           ],
         ),
-      ),
+      ],
+    );
+  }
+
+  Widget buildOrderDiscount() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Giảm giá đơn hàng',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              FormBuilderTextField(
+                name: 'order_discount',
+                controller: discountController,
+                keyboardType: TextInputType.number,
+                onTapOutside: (event) => FocusScope.of(context).unfocus(),
+                style: TextStyle(fontSize: 13),
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  isDense: true,
+                  hintText: '0',
+                ),
+                onChanged: (val) {
+                  updatePaid();
+                },
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Loại',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              DropdownButtonFormField<DiscountType>(
+                value: _discountType,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  isDense: true,
+                ),
+                items: [
+                  DropdownMenuItem(value: DiscountType.price, child: Text('đ')),
+                  DropdownMenuItem(
+                      value: DiscountType.percent, child: Text('%')),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      _discountType = val;
+                      updatePaid();
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget buildNote() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Ghi chú đơn hàng',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        SizedBox(height: 8),
+        FormBuilderTextField(
+          name: 'order_note',
+          onTapOutside: (event) => FocusScope.of(context).unfocus(),
+          style: TextStyle(fontSize: 13),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+            hintText: 'Nhập ghi chú cho đơn hàng...',
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+
+  Widget buildMainActionButton(BuildContext context) {
+    if (currentRoomType == TableStatus.using) {
+      return Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.green,
+                minimumSize: Size(80, 40),
+              ),
+              onPressed: () => submit(currentRoomType),
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_shopping_cart, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text('Cập nhật', style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                minimumSize: Size(80, 40),
+                backgroundColor: Colors.blue,
+              ),
+              onPressed: () => submit(TableStatus.free, isPay: true),
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.attach_money, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text('Thanh toán',
+                            style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      );
+    } else if (currentRoomType == TableStatus.preOrder) {
+      return Row(
+        children: [
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.green,
+                minimumSize: Size(80, 40),
+              ),
+              onPressed: () => submit(currentRoomType),
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_shopping_cart, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text('Cập nhật', style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+            ),
+          ),
+          SizedBox(width: 10),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: Colors.blue,
+                minimumSize: Size(80, 40),
+              ),
+              onPressed: () => submit(TableStatus.using),
+              child: _isLoading
+                  ? CircularProgressIndicator(color: Colors.white)
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.save, color: Colors.white),
+                        SizedBox(width: 4),
+                        Text('Tạo đơn', style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return Row(
+      children: [
+        Expanded(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              backgroundColor: Colors.green,
+              minimumSize: Size(80, 40),
+            ),
+            onPressed: () => submit(TableStatus.using),
+            child: _isLoading
+                ? CircularProgressIndicator(color: Colors.white)
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.save, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text('Tạo đơn', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+          ),
+        ),
+        SizedBox(width: 10),
+        Expanded(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              minimumSize: Size(80, 40),
+              backgroundColor: Colors.blue,
+            ),
+            onPressed: () => submit(TableStatus.free, isPay: true),
+            child: _isLoading
+                ? CircularProgressIndicator(color: Colors.white)
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.attach_money, color: Colors.white),
+                      SizedBox(width: 4),
+                      Text('Thanh toán', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -50,6 +50,7 @@ class SocketManager {
     });
 
     _socket.on('order-web', (data) {
+      log(data.toString());
       _userEventController?.add({
         'type': 'order-web',
         ...data,
@@ -63,7 +64,6 @@ class SocketManager {
       });
     });
     _socket.on('order-created', (data) {
-      log(data.toString());
       _userEventController?.add({
         'type': 'order-created',
         ...data,

@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
 import 'package:flutter/material.dart';

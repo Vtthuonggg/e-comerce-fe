@@ -13,6 +13,7 @@ import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/category/edit_category_page.dart';
 import 'package:flutter_app/resources/pages/category/list_category_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/category_item.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
@@ -352,12 +353,10 @@ class _ListProductPageState extends NyState<ListProductPage> {
                         child: Text(getResponseError(_pagingController.error))),
                     newPageErrorIndicatorBuilder: (context) => Center(
                         child: Text(getResponseError(_pagingController.error))),
-                    firstPageProgressIndicatorBuilder: (context) => Center(
-                        child: CircularProgressIndicator(
-                            color: ThemeColor.get(context).primaryAccent)),
-                    newPageProgressIndicatorBuilder: (context) => Center(
-                        child: CircularProgressIndicator(
-                            color: ThemeColor.get(context).primaryAccent)),
+                    firstPageProgressIndicatorBuilder: (context) =>
+                        Center(child: AppLoading()),
+                    newPageProgressIndicatorBuilder: (context) =>
+                        Center(child: AppLoading()),
                     itemBuilder: (context, item, index) => buildItem(item),
                     noItemsFoundIndicatorBuilder: (_) =>
                         const Center(child: Text("Không tìm thấy món ăn nào")),

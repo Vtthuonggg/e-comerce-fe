@@ -7,6 +7,7 @@ import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/Supplier/edit_Supplier_page.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -261,12 +262,10 @@ class _ListSupplierPageState extends NyState<ListSupplierPage> {
                       child: Text(getResponseError(_pagingController.error))),
                   newPageErrorIndicatorBuilder: (context) => Center(
                       child: Text(getResponseError(_pagingController.error))),
-                  firstPageProgressIndicatorBuilder: (context) => Center(
-                      child: CircularProgressIndicator(
-                          color: ThemeColor.get(context).primaryAccent)),
-                  newPageProgressIndicatorBuilder: (context) => Center(
-                      child: CircularProgressIndicator(
-                          color: ThemeColor.get(context).primaryAccent)),
+                  firstPageProgressIndicatorBuilder: (context) =>
+                      Center(child: AppLoading()),
+                  newPageProgressIndicatorBuilder: (context) =>
+                      Center(child: AppLoading()),
                   itemBuilder: (context, item, index) => buildItem(item),
                   noItemsFoundIndicatorBuilder: (_) => const Center(
                       child: Text('Không tìm thấy nhà cung cấp nào')),

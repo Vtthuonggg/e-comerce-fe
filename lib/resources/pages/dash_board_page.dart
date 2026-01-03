@@ -1,10 +1,15 @@
+import 'dart:developer';
+
 import 'package:draggable_fab/draggable_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_app/app/models/user.dart';
+import 'package:flutter_app/app/networking/report_api_service.dart';
 import 'package:flutter_app/app/utils/dashboard.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
+import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/constant.dart';
+import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/pages/order/add_storage_order_page.dart';
 import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/table/manage_table_page.dart';
@@ -17,18 +22,44 @@ import 'package:iconsax_plus/iconsax_plus.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class DashboardPage extends StatefulWidget {
+class DashboardPage extends NyStatefulWidget {
   static const path = '/dashboard_page';
 
-  const DashboardPage({Key? key}) : super(key: key);
+  DashboardPage({Key? key}) : super(key: key);
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  NyState<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage>
+class _DashboardPageState extends NyState<DashboardPage>
     with SingleTickerProviderStateMixin {
   User get user => Auth.user<User>()!;
+  int thisWeekRevenue = 0;
+  int thisMonthRevenue = 0;
+  int todayRevenue = 0;
+  @override
+  init() async {
+    super.init();
+    fetchReport();
+  }
+
+  fetchReport() async {
+    try {
+      final res =
+          await api<ReportApiService>(((request) => request.dailyReport()));
+      log(res.toString());
+      if (res['data'] != null) {
+        final reportData = res['data'];
+        todayRevenue = reportData['today']['revenue'] ?? 0;
+        thisWeekRevenue = reportData['this_week']['revenue'] ?? 0;
+        thisMonthRevenue = reportData['this_month']['revenue'] ?? 0;
+      }
+      setState(() {});
+    } catch (e) {
+      CustomToast.showToastError(context, description: getResponseError(e));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var shortestSide = MediaQuery.of(context).size.shortestSide;
@@ -163,8 +194,19 @@ class _DashboardPageState extends State<DashboardPage>
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Xin chào: ${user.name}',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Xin chào: ${user.name}',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                IconButton(
+                    onPressed: () => fetchReport(),
+                    icon: Icon(IconsaxPlusLinear.refresh,
+                        size: 20,
+                        color: ThemeColor.get(context).primaryAccent)),
+              ],
+            ),
             Divider(
               color: HexColor.fromHex('#EAEAEA'),
               height: 12,
@@ -198,7 +240,7 @@ class _DashboardPageState extends State<DashboardPage>
                     SizedBox(
                       height: 10,
                     ),
-                    Text(vnd.format(1000000 ?? 0).replaceAll('.', ','),
+                    Text(vnd.format(todayRevenue).replaceAll('.', ','),
                         style: TextStyle(
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
@@ -231,7 +273,7 @@ class _DashboardPageState extends State<DashboardPage>
                           color: Color(0xff5C5C5C)),
                     ),
                     Text(
-                      vnd.format(74390000).replaceAll('.', ','),
+                      vnd.format(thisWeekRevenue).replaceAll('.', ','),
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -250,7 +292,7 @@ class _DashboardPageState extends State<DashboardPage>
                           color: Color(0xff5C5C5C)),
                     ),
                     Text(
-                      vnd.format(348960005000).replaceAll('.', ','),
+                      vnd.format(thisMonthRevenue).replaceAll('.', ','),
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

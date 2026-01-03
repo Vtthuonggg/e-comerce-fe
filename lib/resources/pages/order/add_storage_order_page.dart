@@ -11,6 +11,7 @@ import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/widgets/add_order_item_card.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/select_multi_ingredient.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_app/resources/widgets/select_supplier.dart';
@@ -478,13 +479,11 @@ class _AddStorageOrderPageState extends NyState<AddStorageOrderPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            ),
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                )),
                             SizedBox(width: 12),
                             Text('Đang tạo đơn...'),
                           ],

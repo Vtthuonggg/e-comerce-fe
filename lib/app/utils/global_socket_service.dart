@@ -119,17 +119,15 @@ class GlobalSocketService {
     final currentUserApiKey = Auth.user<User>()?.apiKey;
     final receivedApiKey = orderWebData['apiKey'];
     if (currentUserApiKey != null && currentUserApiKey == receivedApiKey) {
-      var featuresStatus = await getDetailInvoiceConfig();
-      if (featuresStatus['is_noti_sound'] == true) {
-        _playNotificationSound();
-        await Future.delayed(Duration(milliseconds: 800));
-        final description = orderWebData['description']?.toString() ??
-            'Đơn hàng đã được cập nhật';
-        final headerInfo = extractHeaderFromDescription(description);
-        final title = headerInfo['title'] ?? description;
-        final roomName = _extractRoomNameFromTitle(title);
-        _speakVietnamese(roomName);
-      }
+      // var featuresStatus = await getDetailInvoiceConfig();
+      _playNotificationSound();
+      await Future.delayed(Duration(milliseconds: 800));
+      final description = orderWebData['description']?.toString() ??
+          'Đơn hàng đã được cập nhật';
+      final headerInfo = extractHeaderFromDescription(description);
+      final title = headerInfo['title'] ?? description;
+      final roomName = _extractRoomNameFromTitle(title);
+      _speakVietnamese(roomName);
 
       final currentRoute = _getCurrentRouteFromNyRouter();
       if (currentRoute == '/beverage-reservation' ||

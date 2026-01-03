@@ -7,6 +7,7 @@ import 'package:flutter_app/app/networking/employee_api.dart';
 import 'package:flutter_app/app/networking/ingredient_api.dart';
 import 'package:flutter_app/app/networking/order_api_service.dart';
 import 'package:flutter_app/app/networking/product_api.dart';
+import 'package:flutter_app/app/networking/report_api_service.dart';
 import 'package:flutter_app/app/networking/room_api_service.dart';
 import 'package:flutter_app/app/networking/supplier_api.dart';
 import '/app/models/user.dart';
@@ -49,6 +50,7 @@ final Map<Type, BaseApiService> apiDecoders = {
   RoomApiService: RoomApiService(),
   OrderApiService: OrderApiService(),
   EmployeeApiService: EmployeeApiService(),
+  ReportApiService: ReportApiService(),
   // ...
 };
 

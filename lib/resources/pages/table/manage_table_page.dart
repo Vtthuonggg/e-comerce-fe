@@ -6,6 +6,7 @@ import 'package:flutter_app/app/networking/room_api_service.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/table/table_item.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_app/resources/widgets/manage_table/add_table_bulk.dart';
 import 'package:flutter_app/resources/widgets/manage_table/edit_areas.dart';
@@ -137,10 +138,7 @@ class _ManageTablePageState extends NyState<ManageTablePage> {
                 switch (snapshot.connectionState) {
                   case ConnectionState.none:
                   case ConnectionState.waiting:
-                    return Center(
-                        child: CircularProgressIndicator(
-                      color: ThemeColor.get(context).primaryAccent,
-                    ));
+                    return Center(child: AppLoading());
                   case ConnectionState.active:
                   case ConnectionState.done:
                     if (snapshot.hasError) {

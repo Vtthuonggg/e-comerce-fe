@@ -11,6 +11,7 @@ import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -317,8 +318,8 @@ class _EditIngredientPageState extends NyState<EditIngredientPage> {
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
-                                      color: Colors.white, strokeWidth: 2),
-                                )
+                                    color: Colors.white,
+                                  ))
                               : Text(isEdit ? 'Cập nhật' : 'Tạo',
                                   style: TextStyle(fontSize: 16)),
                         ),

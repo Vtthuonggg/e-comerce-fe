@@ -6,6 +6,7 @@ import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
 import 'package:flutter_app/resources/pages/table/manage_table_page.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditAreas extends StatefulWidget {
@@ -213,13 +214,11 @@ class _EditAreasState extends State<EditAreas> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                ),
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                    )),
                                 SizedBox(width: 8),
                                 Text('Đang tạo...'),
                               ],

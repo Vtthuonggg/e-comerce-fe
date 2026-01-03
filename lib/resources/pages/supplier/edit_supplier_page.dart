@@ -7,6 +7,7 @@ import 'package:flutter_app/app/networking/supplier_api.dart';
 
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
+import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_app/resources/widgets/gradient_appbar.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -292,9 +293,7 @@ class _EditSupplierPageState extends NyState<EditSupplierPage> {
                                       height: 22,
                                       child: CircularProgressIndicator(
                                         color: Colors.white,
-                                        strokeWidth: 2,
-                                      ),
-                                    )
+                                      ))
                                   : Text(
                                       isEdit
                                           ? 'Lưu thay đổi'
