@@ -3,15 +3,27 @@ import 'package:flutter_app/app/models/Ingredient.dart';
 import 'package:flutter_app/app/models/category.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-enum DiscountType { percent, price }
+enum DiscountType {
+  percent,
+  price;
 
-extension DiscountTypeExtension on DiscountType {
   int getValueRequest() {
     switch (this) {
       case DiscountType.percent:
-        return 2;
-      case DiscountType.price:
         return 1;
+      case DiscountType.price:
+        return 2;
+    }
+  }
+
+  static DiscountType fromValueRequest(int value) {
+    switch (value) {
+      case 1:
+        return DiscountType.percent;
+      case 2:
+        return DiscountType.price;
+      default:
+        return DiscountType.percent;
     }
   }
 }
@@ -33,6 +45,8 @@ class Product extends Model {
   String? note;
   bool isManuallyEdited = false;
   num? overriddenPrice;
+  List<dynamic>? toppings;
+  bool isTopping = false;
 
   // Text controllers
   final TextEditingController txtQuantity = TextEditingController();
@@ -65,6 +79,7 @@ class Product extends Model {
         ?.map((e) => Ingredient.fromJson(e))
         .toList();
     txtQuantity.text = '1';
+    isTopping = data['is_topping'] ?? false;
   }
 
   @override

@@ -77,4 +77,23 @@ class ProductApiService extends BaseApiService {
           return response.data;
         });
   }
+
+  Future<dynamic> listTopping(String? name, int page, int size) async {
+    var queryParameters = {
+      "name": name,
+      "page": page,
+      "per_page": size,
+      "is_topping": true,
+    };
+    return await network(
+      request: (request) =>
+          request.get("/product", queryParameters: queryParameters),
+      handleFailure: (error) {
+        throw error;
+      },
+      handleSuccess: (response) async {
+        return response.data;
+      },
+    );
+  }
 }

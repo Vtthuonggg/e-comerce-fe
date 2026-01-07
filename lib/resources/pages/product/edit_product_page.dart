@@ -47,6 +47,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
   File? _imageFile;
   String? _imageUrl; // existing remote image
   final ImagePicker _picker = ImagePicker();
+  bool isTopping = false;
   @override
   void initState() {
     super.initState();
@@ -67,6 +68,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
       'stock': roundQuantity(data.stock ?? 0),
       'unit': data.unit ?? '',
     });
+    isTopping = data.isTopping;
     final img = data.image;
     if (img != null && img.toString().isNotEmpty) {
       setState(() => _imageUrl = img.toString());
@@ -84,9 +86,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
 
   Future saveProduct() async {
     if (_formKey.currentState?.saveAndValidate() ?? false) {
-      if (selectedIng
-          .where((element) => element.quantity == null || element.quantity == 0)
-          .isNotEmpty) {
+      if (selectedIng.where((element) => element.quantity == 0).isNotEmpty) {
         CustomToast.showToastError(context,
             description:
                 "Vui lòng nhập số lượng cho tất cả nguyên liệu đã chọn");
@@ -126,6 +126,7 @@ class _EditProductPageState extends NyState<EditProductPage> {
                 })
             .toList(),
         'image': imageUrl.isEmpty ? null : imageUrl,
+        'is_topping': isTopping,
       };
 
       try {
@@ -349,6 +350,25 @@ class _EditProductPageState extends NyState<EditProductPage> {
                     addMultiCategory(listCategory ?? []);
                   },
                   selectedItems: selectedCates,
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    Text(
+                      'Topping',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    Spacer(),
+                    Checkbox(
+                      value: isTopping,
+                      onChanged: (value) {
+                        setState(() {
+                          isTopping = value ?? false;
+                        });
+                      },
+                    )
+                  ],
                 ),
                 SizedBox(height: 16),
                 IngredientMultiSelect(

@@ -18,17 +18,16 @@ class OrderApiService extends BaseApiService {
     LoggingInterceptor: LoggingInterceptor()
   };
 
-  Future<dynamic> listOrder(
-    String? name,
-    int page,
-    int size,
-  ) async {
+  Future<dynamic> listOrder(String? name, int page, int size,
+      {int? type}) async {
     var queryParameters = {
       "name": name,
       "page": page,
       "per_page": size,
     };
-
+    if (type != null) {
+      queryParameters["type"] = type;
+    }
     return await network(
       request: (request) =>
           request.get("/order", queryParameters: queryParameters),
@@ -36,7 +35,6 @@ class OrderApiService extends BaseApiService {
         throw error;
       },
       handleSuccess: (response) async {
-        log(response.data.toString());
         return response.data;
       },
     );
@@ -52,6 +50,8 @@ class OrderApiService extends BaseApiService {
   }
 
   Future updateOrder(int id, dynamic data) async {
+    log(data.toString());
+    log("Updating order with id: $id");
     return await network(
         request: (request) => request.put("/order/$id", data: data),
         handleFailure: (error) => throw error,
@@ -74,6 +74,7 @@ class OrderApiService extends BaseApiService {
         request: (request) => request.get("/order/$id"),
         handleFailure: (error) => throw error,
         handleSuccess: (response) async {
+          log("Detail Order Response: ${response.data}");
           return response.data;
         });
   }

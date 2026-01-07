@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:nylo_framework/nylo_framework.dart';
 
 class User extends Model {
@@ -13,7 +11,7 @@ class User extends Model {
   int? type;
   String? apiKey;
   bool isPosRoomUser = false;
-
+  int? managerId;
   User();
 
   User.fromJson(dynamic data) {
@@ -26,6 +24,7 @@ class User extends Model {
     image = data['image'];
     type = data['user_type'] ?? 2;
     apiKey = data['api_key'];
+    managerId = data['owner_id'];
   }
 
   @override

@@ -5,6 +5,8 @@ import 'package:flutter_app/resources/pages/customer/list_customer_page.dart';
 import 'package:flutter_app/resources/pages/ingredient/list_ingredient_page.dart';
 import 'package:flutter_app/resources/pages/employee/list_emplopyee_page.dart';
 import 'package:flutter_app/resources/pages/main_page.dart';
+import 'package:flutter_app/resources/pages/report/report_cash_book_page.dart';
+import 'package:flutter_app/resources/pages/report/report_page.dart';
 import 'package:flutter_app/resources/pages/supplier/list_supplier_page.dart';
 import 'package:flutter_app/resources/themes/styles/color_styles.dart';
 import 'package:iconsax_plus/iconsax_plus.dart';
@@ -100,7 +102,7 @@ extension DashboardItemExtension on DashboardItem {
       case DashboardItem.Storage:
         return MainPage.path;
       case DashboardItem.CashBook:
-        return MainPage.path;
+        return ReportCashBookPage.path;
       case DashboardItem.Employee:
         return ListEmployeePage.path;
       case DashboardItem.Customer:
@@ -108,7 +110,7 @@ extension DashboardItemExtension on DashboardItem {
       case DashboardItem.Supplier:
         return ListSupplierPage.path;
       case DashboardItem.Report:
-        return MainPage.path;
+        return ReportPage.path;
       case DashboardItem.Category:
         return ListCategoryPage.path;
       default:

@@ -4,7 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'package:flutter_app/app/models/user.dart';
-import 'package:flutter_app/resources/pages/order/select_multi_product_page.dart';
+import 'package:flutter_app/resources/pages/order/edit_order_page.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
@@ -585,7 +585,7 @@ class _TableItemState extends State<TableItem> {
           onTap: () {
             if (widget.status == TableStatus.free) {
               routeTo(
-                SelectMultiProductPage.path,
+                EditOrderPage.path,
                 data: {
                   "room_id": widget.id,
                   "room_type": TableStatus.free.toValue(),
@@ -599,7 +599,23 @@ class _TableItemState extends State<TableItem> {
               );
             } else {
               if (widget.status == TableStatus.using) {
-                // goToUpdateOrder(TableStatus.free, true);
+                routeTo(
+                  EditOrderPage.path,
+                  data: {
+                    "room_id": widget.id,
+                    "room_type": TableStatus.using.toValue(),
+                    "button_type": "edit_order",
+                    "room_name": widget.name,
+                    "area_name": widget.areaName,
+                    "order_id":
+                        widget.order != null ? widget.order['id'] : null,
+                  },
+                  onPop: (value) {
+                    widget.refresh();
+                  },
+                );
+              } else {
+                // showDetailModal();
               }
             }
           },

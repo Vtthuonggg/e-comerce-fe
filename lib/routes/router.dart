@@ -1,7 +1,7 @@
 import 'package:flutter_app/resources/pages/login_page.dart';
 import 'package:flutter_app/main.dart';
+import 'package:flutter_app/resources/pages/order/detail_order_page.dart';
 import 'package:flutter_app/resources/pages/order/edit_order_page.dart';
-import 'package:flutter_app/resources/pages/order/select_multi_product_page.dart';
 import 'package:flutter_app/resources/pages/register_info_page.dart';
 import 'package:flutter_app/resources/pages/register_otp_page.dart';
 import 'package:flutter_app/resources/pages/register_page.dart';
@@ -20,7 +20,11 @@ import 'package:flutter_app/resources/pages/order/add_storage_order_page.dart';
 import 'package:flutter_app/resources/pages/order/order_list_all_page.dart';
 import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/pages/product/list_product_page.dart';
+import 'package:flutter_app/resources/pages/report/ingredient_purchase_report_page.dart';
+import 'package:flutter_app/resources/pages/report/product_sales_report_page.dart';
+import 'package:flutter_app/resources/pages/report/report_cash_book_page.dart';
 import 'package:flutter_app/resources/pages/report/report_page.dart';
+import 'package:flutter_app/resources/pages/report/revenue_report_page.dart';
 import 'package:flutter_app/resources/pages/setting/info_account_setting_page.dart';
 import 'package:flutter_app/resources/pages/setting/setting_page.dart';
 import 'package:flutter_app/resources/pages/supplier/list_supplier_page.dart';
@@ -200,14 +204,38 @@ appRouter() => nyRoutes((router) {
         pageTransitionSettings: const PageTransitionSettings(),
       );
       router.route(
-        SelectMultiProductPage.path,
-        (context) => SelectMultiProductPage(),
+        EditOrderPage.path,
+        (context) => EditOrderPage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );
       router.route(
-        EditOrderPage.path,
-        (context) => EditOrderPage(),
+        DetailOrderPage.path,
+        (context) => DetailOrderPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        RevenueReportPage.path,
+        (context) => RevenueReportPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ProductSalesReportPage.path,
+        (context) => ProductSalesReportPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        IngredientPurchaseReportPage.path,
+        (context) => IngredientPurchaseReportPage(),
+        transition: PageTransitionType.fade,
+        pageTransitionSettings: const PageTransitionSettings(),
+      );
+      router.route(
+        ReportCashBookPage.path,
+        (context) => ReportCashBookPage(),
         transition: PageTransitionType.fade,
         pageTransitionSettings: const PageTransitionSettings(),
       );

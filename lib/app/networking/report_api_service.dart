@@ -31,4 +31,108 @@ class ReportApiService extends BaseApiService {
       },
     );
   }
+
+  Future<dynamic> getQuickStats() async {
+    return await network(
+      request: (request) => request.get('/report/quick-stats'),
+    );
+  }
+
+  Future<dynamic> getRevenueReport({
+    String? startDate,
+    String? endDate,
+  }) async {
+    Map<String, dynamic> params = {};
+    if (startDate != null) params['start'] = startDate;
+    if (endDate != null) params['end'] = endDate;
+
+    return await network(
+      request: (request) =>
+          request.get('/report/revenue', queryParameters: params),
+      handleFailure: (error) {
+        throw error;
+      },
+      handleSuccess: (response) async {
+        log(response.data.toString());
+        return response.data;
+      },
+    );
+  }
+
+  Future<dynamic> getProductSalesReport({
+    String? startDate,
+    String? endDate,
+  }) async {
+    Map<String, dynamic> params = {};
+    if (startDate != null) params['start'] = startDate;
+    if (endDate != null) params['end'] = endDate;
+
+    return await network(
+      request: (request) =>
+          request.get('/report/product-sales', queryParameters: params),
+      handleFailure: (error) {
+        throw error;
+      },
+      handleSuccess: (response) async {
+        log(response.data.toString());
+        return response.data;
+      },
+    );
+  }
+
+  Future<dynamic> getIngredientPurchaseReport({
+    String? startDate,
+    String? endDate,
+  }) async {
+    Map<String, dynamic> params = {};
+    if (startDate != null) params['start'] = startDate;
+    if (endDate != null) params['end'] = endDate;
+
+    return await network(
+      request: (request) =>
+          request.get('/report/ingredient-purchase', queryParameters: params),
+    );
+  }
+
+  Future<dynamic> getDashboardReport({
+    String? startDate,
+    String? endDate,
+  }) async {
+    Map<String, dynamic> params = {};
+    if (startDate != null) params['start'] = startDate;
+    if (endDate != null) params['end'] = endDate;
+
+    return await network(
+      request: (request) =>
+          request.get('/report/dashboard', queryParameters: params),
+      handleFailure: (error) {
+        throw error;
+      },
+      handleSuccess: (response) async {
+        log(response.data.toString(), name: 'Dashboard Report');
+        return response.data;
+      },
+    );
+  }
+
+  Future<dynamic> reportCashBook({
+    String? startDate,
+    String? endDate,
+  }) async {
+    Map<String, dynamic> params = {};
+    if (startDate != null) params['start'] = startDate;
+    if (endDate != null) params['end'] = endDate;
+
+    return await network(
+      request: (request) =>
+          request.get('/report/income-expense', queryParameters: params),
+      handleFailure: (error) {
+        throw error;
+      },
+      handleSuccess: (response) async {
+        log(response.data.toString(), name: 'Cash Book Report');
+        return response.data;
+      },
+    );
+  }
 }

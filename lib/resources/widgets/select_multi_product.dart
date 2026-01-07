@@ -3,25 +3,27 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app/app/models/Ingredient.dart';
-import 'package:flutter_app/app/networking/ingredient_api.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_app/app/models/product.dart';
+import 'package:flutter_app/app/networking/product_api.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/app/utils/message.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
-import 'package:flutter_app/resources/pages/ingredient/edit_ingredient_page.dart';
+import 'package:flutter_app/resources/pages/product/edit_product_page.dart';
 import 'package:flutter_app/resources/widgets/app_loading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:nylo_framework/nylo_framework.dart';
 
-class IngredientMultiSelect extends NyStatefulWidget {
-  final GlobalKey<DropdownSearchState<Ingredient>> multiKey;
-  final void Function(List<Ingredient>? variant) onSelect;
-  final List<Ingredient> selectedItems;
+class ProductMultiSelect extends NyStatefulWidget {
+  final GlobalKey<DropdownSearchState<Product>> multiKey;
+  final void Function(List<Product>? products) onSelect;
+  final List<Product> selectedItems;
   final String confirmText;
   bool? isShowList = true;
-  IngredientMultiSelect({
+
+  ProductMultiSelect({
     Key? key,
     required this.multiKey,
     required this.onSelect,
@@ -31,16 +33,16 @@ class IngredientMultiSelect extends NyStatefulWidget {
   });
 
   @override
-  NyState<IngredientMultiSelect> createState() => IngredientMultiSelectState();
+  NyState<ProductMultiSelect> createState() => ProductMultiSelectState();
 }
 
-class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
+class ProductMultiSelectState extends NyState<ProductMultiSelect> {
   static const _pageSize = 10;
-  final PagingController<int, Ingredient> _pagingController =
+  final PagingController<int, Product> _pagingController =
       PagingController(firstPageKey: 1);
   String keyword = '';
   TextEditingController searchBoxController = TextEditingController();
-  List<Ingredient> listItemsSelectedTmp = [];
+  List<Product> listItemsSelectedTmp = [];
   Timer? _debounce;
 
   @override
@@ -53,17 +55,15 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
 
   _fetchPage(int pageKey) async {
     try {
-      var res =
-          await api<IngredientApiService>((request) => request.listIngredient(
-                keyword.isEmpty ? null : keyword,
-                pageKey,
-                _pageSize,
-              ));
-      List<Ingredient> ingredientItems = res['data']
-          .map<Ingredient>((data) => Ingredient.fromJson(data))
-          .toList();
+      var res = await api<ProductApiService>((request) => request.listProduct(
+            keyword.isEmpty ? null : keyword,
+            pageKey,
+            _pageSize,
+          ));
+      List<Product> productItems =
+          res['data'].map<Product>((data) => Product.fromJson(data)).toList();
       listItemsSelectedTmp = [...widget.selectedItems];
-      for (var item in ingredientItems) {
+      for (var item in productItems) {
         var i = listItemsSelectedTmp
             .firstWhereOrNull((element) => element.id == item.id);
         if (i != null) {
@@ -72,12 +72,12 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
           item.isSelected = false;
         }
       }
-      final isLastPage = ingredientItems.length < _pageSize;
+      final isLastPage = productItems.length < _pageSize;
       if (isLastPage) {
-        _pagingController.appendLastPage(ingredientItems);
+        _pagingController.appendLastPage(productItems);
       } else {
         final nextPageKey = pageKey + 1;
-        _pagingController.appendPage(ingredientItems, nextPageKey);
+        _pagingController.appendPage(productItems, nextPageKey);
       }
     } catch (error) {
       _pagingController.error = error;
@@ -106,7 +106,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        DropdownSearch<Ingredient>(
+        DropdownSearch<Product>(
           key: widget.multiKey,
           onBeforePopupOpening: (value) async {
             searchBoxController.text = '';
@@ -117,7 +117,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
             return true;
           },
           popupProps: PopupProps.modalBottomSheet(
-              constraints: BoxConstraints(maxHeight: 0.7.sh),
+              constraints: BoxConstraints(maxHeight: 0.8.sh),
               containerBuilder: (context, popupWidget) {
                 return Container(
                   decoration: BoxDecoration(
@@ -140,7 +140,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                               child: Container(
                                 margin: EdgeInsets.all(16.w),
                                 child: Text(
-                                  'Chọn nguyên liệu',
+                                  'Chọn món ăn',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontSize: 18,
@@ -184,7 +184,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                                   cursorColor:
                                       ThemeColor.get(context).primaryAccent,
                                   decoration: InputDecoration(
-                                    hintText: "Tên nguyên liệu",
+                                    hintText: "Tên món ăn",
                                     hintStyle: TextStyle(color: Colors.grey),
                                     prefixIcon: Icon(
                                       Icons.search,
@@ -211,7 +211,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                                 child: InkWell(
                                     onTap: () {
                                       routeTo(
-                                        EditIngredientPage.path,
+                                        EditProductPage.path,
                                         onPop: (value) {
                                           if (value != null) {
                                             _pagingController.refresh();
@@ -226,10 +226,17 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                         ),
                       ),
                       Expanded(
-                        child: PagedListView<int, Ingredient>(
+                        child: PagedGridView<int, Product>(
                           pagingController: _pagingController,
-                          builderDelegate:
-                              PagedChildBuilderDelegate<Ingredient>(
+                          padding: EdgeInsets.all(12),
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.8,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                          ),
+                          builderDelegate: PagedChildBuilderDelegate<Product>(
                             firstPageErrorIndicatorBuilder: (context) => Center(
                               child: Text(
                                   getResponseError(_pagingController.error)),
@@ -245,7 +252,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                             itemBuilder: (context, item, index) =>
                                 buildPopupItem(context, item),
                             noItemsFoundIndicatorBuilder: (_) => Center(
-                                child: Text("Không tìm thấy nguyên liệu nào")),
+                                child: Text("Không tìm thấy món ăn nào")),
                           ),
                         ),
                       ),
@@ -256,7 +263,7 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
               }),
           dropdownDecoratorProps: DropDownDecoratorProps(
             dropdownSearchDecoration: InputDecoration(
-              labelText: 'Chọn nguyên liệu',
+              labelText: 'Chọn món ăn',
               labelStyle: TextStyle(fontWeight: FontWeight.bold),
               floatingLabelBehavior: FloatingLabelBehavior.never,
               border: OutlineInputBorder(
@@ -265,204 +272,131 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
             ),
           ),
         ),
-        if (widget.selectedItems.isNotEmpty && widget.isShowList == true) ...[
-          SizedBox(height: 16),
-          Text(
-            'Nguyên liệu đã chọn:',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          ...widget.selectedItems
-              .map((ingredient) => buildSelectedIngredientItem(ingredient)),
-        ],
       ],
     );
   }
 
-  Widget buildSelectedIngredientItem(Ingredient ingredient) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 4),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[200]!),
-      ),
-      child: Row(
-        children: [
-          // Ảnh nguyên liệu
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: ingredient.image != null && ingredient.image!.isNotEmpty
-                ? Image.network(
-                    ingredient.image!,
-                    width: 40,
-                    height: 40,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 40,
-                      height: 40,
-                      color: Colors.grey[200],
-                      child:
-                          Image.asset('public/assets/images/placeholder.png'),
-                    ),
-                  )
-                : Container(
-                    width: 40,
-                    height: 40,
-                    color: Colors.grey[200],
-                    child: Image.asset('public/assets/images/placeholder.png'),
-                  ),
-          ),
-          SizedBox(width: 12),
-          // Tên nguyên liệu
-          Expanded(
-            child: Text(
-              ingredient.name ?? '',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-              ),
-            ),
-          ),
-          // Input số lượng và unit
-          SizedBox(
-            width: 80,
-            child: TextFormField(
-              initialValue: ingredient.quantity != null
-                  ? ingredient.quantity.toString()
-                  : '',
-              keyboardType: TextInputType.numberWithOptions(decimal: true),
-              onChanged: (value) {
-                setState(() {
-                  ingredient.quantity = stringToDouble(value) ?? 0;
-                });
-              },
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                contentPadding:
-                    EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                hintText: '0',
-                hintStyle: TextStyle(fontSize: 12),
-              ),
-              style: TextStyle(fontSize: 12),
-            ),
-          ),
-          SizedBox(width: 8),
-          Text(
-            ingredient.unit ?? '',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-            ),
-          ),
-          SizedBox(width: 8),
-          // Nút xóa
-          InkWell(
-            onTap: () {
-              setState(() {
-                widget.selectedItems
-                    .removeWhere((item) => item.id == ingredient.id);
-                ingredient.quantity = 0;
-              });
-              widget.onSelect(widget.selectedItems);
-            },
-            child: Icon(
-              Icons.remove_circle_outline,
-              color: Colors.red,
-              size: 20,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildPopupItem(BuildContext context, Ingredient item) {
+  Widget buildPopupItem(BuildContext context, Product item) {
     bool isSelected = listItemsSelectedTmp
             .firstWhereOrNull((element) => element.id == item.id) !=
         null;
 
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      decoration: BoxDecoration(
-        color: isSelected
-            ? ThemeColor.get(context).primaryAccent.withOpacity(0.1)
-            : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
+    return InkWell(
+      onTap: () {
+        setState(() {
+          if (isSelected) {
+            listItemsSelectedTmp
+                .removeWhere((element) => element.id == item.id);
+          } else {
+            listItemsSelectedTmp.add(item);
+          }
+        });
+      },
+      child: Container(
+        decoration: BoxDecoration(
           color: isSelected
-              ? ThemeColor.get(context).primaryAccent.withOpacity(0.3)
-              : Colors.grey[200]!,
+              ? ThemeColor.get(context).primaryAccent.withOpacity(0.1)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? ThemeColor.get(context).primaryAccent
+                : Colors.grey[300]!,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 4,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            AspectRatio(
+              aspectRatio: 1.2,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(10)),
+                    child: Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.grey[200],
+                      child: item.image != null && item.image!.isNotEmpty
+                          ? Image.network(
+                              item.image!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                      'public/assets/images/placeholder.png',
+                                      fit: BoxFit.cover),
+                            )
+                          : Image.asset('public/assets/images/placeholder.png',
+                              fit: BoxFit.cover),
+                    ),
+                  ),
+                  if (isSelected)
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        padding: EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          color: ThemeColor.get(context).primaryAccent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.check, color: Colors.white, size: 14),
+                      ),
+                    ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 5,
+                    child: Center(
+                      child: Container(
+                        margin: EdgeInsets.symmetric(horizontal: 6),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.white),
+                        child: Text(
+                          vnd.format(item.retailCost ?? 0),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: ThemeColor.get(context).primaryAccent),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  item.name ?? '',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    color: isSelected
+                        ? ThemeColor.get(context).primaryAccent
+                        : Colors.grey[800],
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
-      child: ListTile(
-          onTap: () {
-            setState(() {
-              if (isSelected) {
-                listItemsSelectedTmp
-                    .removeWhere((element) => element.id == item.id);
-              } else {
-                listItemsSelectedTmp.add(item);
-              }
-            });
-          },
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: item.image != null && item.image!.isNotEmpty
-                ? Image.network(
-                    item.image!,
-                    width: 50,
-                    height: 50,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      width: 50,
-                      height: 50,
-                      color: Colors.grey[200],
-                      child:
-                          Image.asset('public/assets/images/placeholder.png'),
-                    ),
-                  )
-                : Container(
-                    width: 50,
-                    height: 50,
-                    color: Colors.grey[200],
-                    child: Image.asset('public/assets/images/placeholder.png'),
-                  ),
-          ),
-          title: Text(
-            item.name!.length > 25
-                ? item.name!.substring(0, 25) + '...'
-                : item.name!,
-            style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: isSelected
-                  ? ThemeColor.get(context).primaryAccent
-                  : Colors.grey[800],
-            ),
-          ),
-          subtitle: Text('Tồn kho: ${roundQuantity(item.inStock ?? 0)}',
-              style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-          trailing: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                vnd.format(item.baseCost ?? 0),
-                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-              ),
-              if (item.unit != null && item.unit!.isNotEmpty) ...[
-                Text('ĐV: ${item.unit}',
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]))
-              ]
-            ],
-          )),
     );
   }
 
@@ -472,6 +406,16 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
         padding: shortestSide < 600
             ? EdgeInsets.all(16.w)
             : EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.w),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
         child: Row(
           children: [
             Expanded(
@@ -480,8 +424,8 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      backgroundColor: Colors.blue,
-                      minimumSize: Size(80, 40)),
+                      backgroundColor: ThemeColor.get(context).primaryAccent,
+                      minimumSize: Size(80, 48)),
                   onPressed: () {
                     keyword = '';
                     Navigator.pop(context);
@@ -491,15 +435,18 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
                     });
                   },
                   child: Text(
-                    widget.confirmText,
-                    style: TextStyle(color: Colors.white),
+                    '${widget.confirmText} (${listItemsSelectedTmp.length})',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
                   )),
             ),
           ],
         ));
   }
 
-  void addMultiItems(List<Ingredient> items) {
+  void addMultiItems(List<Product> items) {
     if (items.isEmpty) {
       widget.selectedItems.clear();
       widget.onSelect(widget.selectedItems);
@@ -509,6 +456,13 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
     for (var item in items) {
       if (widget.selectedItems.indexWhere((element) => element.id == item.id) ==
           -1) {
+        // Initialize new product
+        item.quantity = 1;
+        item.txtQuantity.text = '1';
+        item.txtPrice.text = vnd.format(item.retailCost ?? 0);
+        item.txtDiscount.text = '0';
+        item.discount = 0;
+        item.discountType = DiscountType.percent;
         setState(() {
           widget.selectedItems.add(item);
         });
@@ -529,7 +483,6 @@ class IngredientMultiSelectState extends NyState<IngredientMultiSelect> {
     _debounce?.cancel();
     _pagingController.dispose();
     searchBoxController.dispose();
-
     super.dispose();
   }
 }

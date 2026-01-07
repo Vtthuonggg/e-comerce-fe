@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:draggable_fab/draggable_fab.dart';
@@ -7,6 +8,7 @@ import 'package:flutter_app/app/networking/report_api_service.dart';
 import 'package:flutter_app/app/utils/dashboard.dart';
 import 'package:flutter_app/app/utils/formatters.dart';
 import 'package:flutter_app/app/utils/message.dart';
+import 'package:flutter_app/app/utils/socket_manager.dart';
 import 'package:flutter_app/bootstrap/helpers.dart';
 import 'package:flutter_app/config/constant.dart';
 import 'package:flutter_app/resources/pages/custom_toast.dart';
@@ -37,17 +39,29 @@ class _DashboardPageState extends NyState<DashboardPage>
   int thisWeekRevenue = 0;
   int thisMonthRevenue = 0;
   int todayRevenue = 0;
+  SocketManager _socketData = SocketManager();
+  late StreamSubscription<Map<String, dynamic>> _subscription;
   @override
   init() async {
     super.init();
     fetchReport();
+    _subscription = _socketData.userEventStream.listen((data) {
+      if (data['user_id'] != null && data['user_id'] == Auth.user<User>()?.id) {
+        fetchReport();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
   }
 
   fetchReport() async {
     try {
       final res =
           await api<ReportApiService>(((request) => request.dailyReport()));
-      log(res.toString());
       if (res['data'] != null) {
         final reportData = res['data'];
         todayRevenue = reportData['today']['revenue'] ?? 0;
